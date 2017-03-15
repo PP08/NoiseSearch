@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".Activities.MeasureAtSinglePoint" android:screenOrientation="portrait" />
+        <activity android:name=".Activities.MeasureAtMultiPoints" android:screenOrientation="portrait" />
+
+
     </application>
 
 </manifest>
