@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.phucphuong.noisesearch.Fragments.SettingsFragment">
+    tools:context="com.phucphuong.noisesearch.Fragments.SettingsFragment" >
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -64,7 +64,7 @@
         app:layout_constraintVertical_bias="0.615" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tv_values"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
