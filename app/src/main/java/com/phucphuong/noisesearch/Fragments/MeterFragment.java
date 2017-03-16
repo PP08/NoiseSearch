@@ -97,6 +97,7 @@ public class MeterFragment extends Fragment {
             if(isRunning){
                 spl = msg.getData().getDouble("spl");
                 settingsFragment.setValuesText(Double.toString(spl));
+                graphFragment.addEntry(spl);
             }
 
         }

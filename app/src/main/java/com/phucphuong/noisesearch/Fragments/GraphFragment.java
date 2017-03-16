@@ -82,13 +82,17 @@ public class GraphFragment extends Fragment {
         l.setTypeface(mTfLight);
         l.setTextColor(Color.WHITE);
 
+        //
+//        lineChart.setKeepPositionOnRotation(true);
+//        lineChart.setAutoScaleMinMaxEnabled(true);
+
         //axis
         XAxis xl = lineChart.getXAxis();
         xl.setTypeface(mTfLight);
         xl.setTextColor(Color.WHITE);
         xl.setDrawGridLines(false);
         xl.setAvoidFirstLastClipping(true);
-        xl.setEnabled(true);
+        xl.setEnabled(false);
 
         YAxis leftAxis = lineChart.getAxisLeft();
         leftAxis.setTypeface(mTfLight);
@@ -102,16 +106,17 @@ public class GraphFragment extends Fragment {
         rightAxis.setAxisMaximum(140f);
         rightAxis.setAxisMinimum(0f);
 
+
+
     }
 
 
-    private void addEntry(){
+    public void addEntry(double val){
         LineData data = lineChart.getData();
 
         if (data != null){
             ILineDataSet set = data.getDataSetByIndex(0);
             //set.addEntry(...) //can be called as well
-
             if (set == null){
                 set = createSet();
                 data.addDataSet(set);
@@ -135,8 +140,10 @@ public class GraphFragment extends Fragment {
 
     private LineDataSet createSet(){
 
-        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+        LineDataSet set = new LineDataSet(null, "SPL");
+        //set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
+
         set.setColor(ColorTemplate.getHoloBlue());
         set.setCircleColor(Color.WHITE);
         set.setLineWidth(2f);
