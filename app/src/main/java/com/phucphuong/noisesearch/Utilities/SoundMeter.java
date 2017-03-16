@@ -1,4 +1,4 @@
-package com.phucphuong.noisesearch.Fragments;
+package com.phucphuong.noisesearch.Utilities;
 
 import android.content.Context;
 import android.media.AudioFormat;
@@ -14,7 +14,7 @@ import android.util.Log;
 
 import java.io.FileOutputStream;
 import java.util.Calendar;
-
+import java.util.Arrays;
 /**
  * Created by phucphuong on 3/16/17.
  */
@@ -30,19 +30,22 @@ public class SoundMeter {
 
     //for audio recorder
     AudioRecord recordInstance;
-    int FREQUENCY = 8000;
+    int sampleRateInHz = 44100;
     private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    private int BUFFSIZE = 16000; //320 - default
+    private int BUFFSIZE = sampleRateInHz * 4; //320 - default
 
     //for SPL calculation
     double splValue = 0.0;
     int calibrationValue;
 
 
-    public SoundMeter(Handler h, int calValue) {
+    //for testing
+    String errorTag = "has an error: ";
+
+
+    public SoundMeter(Handler h) {
         this.handler = h;
-        this.calibrationValue = calValue;
     }
 
     public class MyRunable implements Runnable{
@@ -52,40 +55,22 @@ public class SoundMeter {
 
             try {
                 Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
-                recordInstance = new AudioRecord(MediaRecorder.AudioSource.MIC, FREQUENCY, CHANNEL, ENCODING, BUFFSIZE);
+                recordInstance = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRateInHz,
+                        CHANNEL, ENCODING, BUFFSIZE);
                 Log.e("State", Integer.toString(recordInstance.getState()));
                 recordInstance.startRecording();
 
                 short[] temBuffer = new short[BUFFSIZE];
 
                 while (isRunning) {
-                    double rsmValue = 0.0;
-
-                    for (int i = 0; i < BUFFSIZE; i++) {
-                        temBuffer[i] = 0;
-                    }
-
-                    recordInstance.read(temBuffer, 0, BUFFSIZE);
-
-                    for (int i = 0; i < BUFFSIZE; i++) {
-                        rsmValue += temBuffer[i] * temBuffer[i];
-                    }
-
-                    rsmValue = Math.sqrt(rsmValue);
-
-                    splValue = 10 * Math.log10(rsmValue/BUFFSIZE);
-
-                    splValue += calibrationValue;
-                    splValue = Math.round(splValue);
-                    sendMessage(isRunning);
+                    splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
+                    //Log.e(errorTag, Double.toString(splValue));
+                    sendMessage();
 
                 }
 
                 recordInstance.stop();
                 recordInstance.release();
-                kill = true;
-                splValue = 0;
-                sendMessage(isRunning);
 
             } catch (Exception e) {
                 Log.e("MY TAG: ", "FAILUREEEEEEEEEEEE");
@@ -94,14 +79,38 @@ public class SoundMeter {
         }
     }
 
+    public Thread thread = new Thread(new MyRunable());
 
-
-    private void sendMessage(boolean isRunning){
+    private void sendMessage(){
         data = Message.obtain();
         b = new Bundle();
         b.putDouble("spl", splValue);
+        b.putBoolean("isRunning", isRunning);
         data.setData(b);
         handler.sendMessage(data);
+    }
+
+    private double measureDecibel(short[] temBuffer, int BUFFSIZE, AudioRecord recordInstance){
+
+        double rsmValue = 0;
+        double spl;
+
+        Arrays.fill(temBuffer, (short) 0);
+
+        recordInstance.read(temBuffer, 0, BUFFSIZE);
+
+        for (int i = 0; i < BUFFSIZE; i++) {
+            rsmValue += temBuffer[i] * temBuffer[i];
+        }
+
+        rsmValue = Math.sqrt(rsmValue);
+        spl = 10 * Math.log10(rsmValue/BUFFSIZE) + 94;
+        spl = Math.round(spl);
+        return  spl;
+    }
+
+    public void terminate() {
+        isRunning = false;
     }
 
 }

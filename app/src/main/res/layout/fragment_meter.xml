@@ -42,22 +42,37 @@
         app:layout_constraintVertical_bias="0.0"
         android:src="@drawable/ic_meter"/>
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_clockwise"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/imageView7"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="@+id/imageView7"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_start_stop"
+        android:layout_marginBottom="35dp" />
+
     <ToggleButton
         android:textOn=""
         android:textOff=""
         android:id="@+id/btn_start_stop"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView7"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout6"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="@+id/imageView7"
         app:layout_constraintRight_toRightOf="@+id/imageView7"
         app:layout_constraintTop_toTopOf="@+id/imageView7"
         app:layout_constraintVertical_bias="1.0"
         android:background="@drawable/start_stop"/>
+
+
 
 </android.support.constraint.ConstraintLayout>
