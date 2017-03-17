@@ -1,7 +1,9 @@
 package com.phucphuong.noisesearch.Fragments;
 
 
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -28,11 +30,14 @@ public class SettingsFragment extends Fragment {
     ImageButton btn_settings, btn_info;
     TextView tv_values;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View settingsView = inflater.inflate(R.layout.fragment_settings, container, true);
+
+        //test dropping shadow
 
         btn_settings = (ImageButton) settingsView.findViewById(R.id.btn_settings);
         btn_info = (ImageButton)settingsView.findViewById(R.id.btn_info);
