@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btn_function1 = (ImageButton)findViewById(R.id.btn_function1);
-        btn_function2 = (ImageButton)findViewById(R.id.btn_function1);
+        btn_function2 = (ImageButton)findViewById(R.id.btn_function2);
 
 
 
@@ -32,8 +32,16 @@ public class MainActivity extends AppCompatActivity {
         btn_function1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MeasureAtSinglePoint.class);
-                startActivity(intent);
+                Intent intent1 = new Intent(MainActivity.this, MeasureAtSinglePoint.class);
+                startActivity(intent1);
+            }
+        });
+
+        btn_function2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(MainActivity.this, MeasureAtMultiPoints.class);
+                startActivity(intent2);
             }
         });
 

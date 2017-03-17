@@ -88,7 +88,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
         app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
         app:layout_constraintRight_toRightOf="@+id/constraintLayout"
-        app:layout_constraintTop_toTopOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout"
+        app:layout_constraintVertical_bias="0.496" />
 
     <ImageButton
         android:id="@+id/btn_function2"
@@ -100,12 +101,12 @@
         android:layout_marginTop="8dp"
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_multipoint"
+        android:src="@drawable/ic_multipoints"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintLeft_toLeftOf="@+id/constraintLayout2"
         app:layout_constraintRight_toRightOf="@+id/constraintLayout2"
         app:layout_constraintTop_toTopOf="@+id/constraintLayout2"
-        app:layout_constraintVertical_bias="0.502" />
+        app:layout_constraintVertical_bias="0.487" />
 
     <TextView
         android:id="@+id/textView"

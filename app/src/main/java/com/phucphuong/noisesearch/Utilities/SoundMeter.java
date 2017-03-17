@@ -1,6 +1,7 @@
 package com.phucphuong.noisesearch.Utilities;
 
 import android.content.Context;
+import android.location.Location;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -12,7 +13,13 @@ import android.os.Process;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.phucphuong.noisesearch.Fragments.MapFragment;
+
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Arrays;
 /**
@@ -26,7 +33,8 @@ public class SoundMeter {
     boolean isRunning = true;
     private Message data;
     private Bundle b;
-    public boolean kill = false;
+    boolean logThreadShouldRun = true;
+
 
     //for audio recorder
     AudioRecord recordInstance;
@@ -40,13 +48,46 @@ public class SoundMeter {
     int calibrationValue;
 
 
+    //for location
+    public GPSTracker gpsTracker;
+    Context context;
+    Location location;
+    double latitude, longitude;
+
+    //for log
+    private String FILENAME = "";
+    private String device_id = "";
+    private String timeStamp;
+    private DateFormat timeStampFormat = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss.SSS");
+
     //for testing
     String errorTag = "has an error: ";
 
-
-    public SoundMeter(Handler h) {
+    public SoundMeter(Handler h, Context context) {
         this.handler = h;
+        this.context = context;
+        gpsTracker = new GPSTracker(context);
+        logThread.start();
     }
+
+
+    public class LogRunnable implements Runnable{
+
+        @Override
+        public void run() {
+            initializeLog();
+
+            while (logThreadShouldRun){
+
+                writeLog();
+
+            }
+        }
+    }
+
+    public Thread logThread = new Thread(new LogRunnable());
+
+
 
     public class MyRunable implements Runnable{
 
@@ -63,14 +104,22 @@ public class SoundMeter {
                 short[] temBuffer = new short[BUFFSIZE];
 
                 while (isRunning) {
+                    long startTime = System.currentTimeMillis();
                     splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
+                    long endTime = System.currentTimeMillis();
+                    timeStamp = getTimestamp(startTime, endTime);
+                    //get the location
+                    location = gpsTracker.lastLocation;
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+
                     //Log.e(errorTag, Double.toString(splValue));
                     sendMessage();
 
                 }
-
                 recordInstance.stop();
                 recordInstance.release();
+                gpsTracker.stopUsingGPS();
 
             } catch (Exception e) {
                 Log.e("MY TAG: ", "FAILUREEEEEEEEEEEE");
@@ -86,6 +135,7 @@ public class SoundMeter {
         b = new Bundle();
         b.putDouble("spl", splValue);
         b.putBoolean("isRunning", isRunning);
+        b.putDoubleArray("location", new double[]{latitude, longitude});
         data.setData(b);
         handler.sendMessage(data);
     }
@@ -111,6 +161,61 @@ public class SoundMeter {
 
     public void terminate() {
         isRunning = false;
+    }
+
+
+    public void initializeLog(){
+
+        device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        setFileName(); // log's name
+        String header = "Device ID" + "," + "Timestamp" + "," + "Pressure" + "," + "Latitude" + "," + "Longitude" + "\n"; //set header for columns
+        FileOutputStream out = null;
+        try {
+            out = context.openFileOutput(FILENAME, Context.MODE_APPEND);
+            out.write(header.getBytes());
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void setFileName(){
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+        String date = df.format(Calendar.getInstance().getTime());
+        FILENAME = date + ".csv";
+    }
+
+    public synchronized void writeLog(){
+
+        try {
+            wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String data;
+        data = device_id + "," + timeStamp + "," + Double.toString(splValue) + "," + Double.toString(longitude) + "," + Double.toString(latitude) +"\n";
+        try{
+            FileOutputStream out = context.openFileOutput(FILENAME, Context.MODE_APPEND);
+            out.write(data.getBytes());
+            out.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized String getTimestamp(long t1, long t2){
+
+        long averageTime = (t1 + t2) / 2;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(averageTime);
+        notify();
+        return timeStampFormat.format(calendar.getTime());
     }
 
 }

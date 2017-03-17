@@ -154,7 +154,6 @@ public class GraphFragment extends Fragment {
         set.setValueTextColor(Color.WHITE);
         set.setValueTextSize(9f);
         set.setDrawValues(false);
-
         return set;
     }
 
