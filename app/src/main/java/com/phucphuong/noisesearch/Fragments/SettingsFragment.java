@@ -44,7 +44,6 @@ public class SettingsFragment extends Fragment {
         btn_settings = (ImageButton) settingsView.findViewById(R.id.btn_settings);
         btn_info = (ImageButton)settingsView.findViewById(R.id.btn_info);
         tv_values = (TextView)settingsView.findViewById(R.id.tv_values);
-
         btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
