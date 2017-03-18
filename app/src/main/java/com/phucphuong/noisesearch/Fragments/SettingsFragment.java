@@ -1,6 +1,8 @@
 package com.phucphuong.noisesearch.Fragments;
 
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -73,7 +75,8 @@ public class SettingsFragment extends Fragment {
 
         builder.setView(mview);
         final AlertDialog dialog = builder.create();
-        //1
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         // dialog.setCanceledOnTouchOutside(false);
         dialog.show();
         ImageButton btn_close = (ImageButton) mview.findViewById(R.id.btn_close);

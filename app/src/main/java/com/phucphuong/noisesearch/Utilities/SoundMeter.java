@@ -42,6 +42,7 @@ public class SoundMeter {
     private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     private int BUFFSIZE = sampleRateInHz * 4; //320 - default
+    //private int BUFFSIZE = sampleRateInHz * 2;
 
     //for SPL calculation
     double splValue = 0.0;
@@ -107,12 +108,11 @@ public class SoundMeter {
                     long startTime = System.currentTimeMillis();
                     splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
                     long endTime = System.currentTimeMillis();
-                    timeStamp = getTimestamp(startTime, endTime);
+                    getTimestamp(startTime, endTime);
                     //get the location
                     location = gpsTracker.lastLocation;
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
-
                     //Log.e(errorTag, Double.toString(splValue));
                     sendMessage();
 
@@ -209,13 +209,13 @@ public class SoundMeter {
         }
     }
 
-    public synchronized String getTimestamp(long t1, long t2){
+    public synchronized void getTimestamp(long t1, long t2){
 
         long averageTime = (t1 + t2) / 2;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(averageTime);
+        timeStamp = timeStampFormat.format(calendar.getTime());
         notify();
-        return timeStampFormat.format(calendar.getTime());
     }
 
 }
