@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.phucphuong.noisesearch.Fragments.MeterFragment"
-    android:elevation="10dp"
-    android:translationZ="5dp"
-    android:background="@drawable/round_corner_background">
+    android:background="@color/background">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -75,9 +73,4 @@
             android:background="@drawable/start_stop"/>
 
     </android.support.constraint.ConstraintLayout>
-
-
-
-
-
 </android.support.constraint.ConstraintLayout>

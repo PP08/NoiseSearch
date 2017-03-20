@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:layout_editor_absoluteY="25dp"
     tools:layout_editor_absoluteX="0dp"
-    android:background="@color/colorAccent">
+    android:background="@color/background">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/single_card"
@@ -17,8 +17,6 @@
         android:layout_marginRight="12dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/round_corner_background"
-        android:elevation="10dp"
-        android:translationZ="5dp"
         app:layout_constraintDimensionRatio="h,3:2"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -84,7 +82,7 @@
         android:name="com.phucphuong.noisesearch.Fragments.SettingsFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="13dp"
+        android:layout_marginBottom="12dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         app:layout_constraintBottom_toBottomOf="parent"

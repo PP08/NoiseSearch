@@ -11,7 +11,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,11 +38,13 @@ public class SettingsFragment extends Fragment {
     }
 
     double calValue = 0;
+//    TODO: implement the calibration using AsyncTask
 
     ImageButton btn_settings, btn_info;
     TextView tv_values;
-    View settingsView;
-    AlertDialog diaglogSettings;
+    View settingsView, settingWindow, infoWindow, calibrationWindow;
+
+    AlertDialog parentDialog, calibrationDialog;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -51,12 +55,14 @@ public class SettingsFragment extends Fragment {
         btn_settings = (ImageButton) settingsView.findViewById(R.id.btn_settings);
         btn_info = (ImageButton)settingsView.findViewById(R.id.btn_info);
         tv_values = (TextView)settingsView.findViewById(R.id.tv_values);
+
         btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                View mview = inflater.inflate(R.layout.setting_window, container, true);
-                showAlertDialog(mview);
+                settingWindow = inflater.inflate(R.layout.setting_window, container, true);
+                calibrationWindow = inflater.inflate(R.layout.fragment_calibration, container, true);
+                showAlertDialog(settingWindow);
 
             }
         });
@@ -64,8 +70,8 @@ public class SettingsFragment extends Fragment {
         btn_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View mview = inflater.inflate(R.layout.info_window, container, true);
-                showAlertDialog(mview);
+                infoWindow = inflater.inflate(R.layout.info_window, container, true);
+                showAlertDialog(infoWindow);
 
             }
         });
@@ -73,22 +79,47 @@ public class SettingsFragment extends Fragment {
         return settingsView;
     }
 
-    private void showAlertDialog(View mview){
+    public void showAlertDialog(View mview){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(mview);
-        diaglogSettings = builder.create();
+        parentDialog = builder.create();
 
-        diaglogSettings.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        diaglogSettings.show();
-
+        parentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        parentDialog.show();
         // dialog.setCanceledOnTouchOutside(false);
         ImageButton btn_close = (ImageButton) mview.findViewById(R.id.btn_close);
         btn_close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                diaglogSettings.dismiss();
+                parentDialog.dismiss();
             }
         });
+
+        //calibrate btn
+        if (mview == settingWindow){
+            Button btn_calibration = (Button)mview.findViewById(R.id.btn_calibration);
+            btn_calibration.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    TODO : show the fragment calibration
+                    parentDialog.dismiss();
+                    showCalibrationWindow(calibrationWindow);
+                }
+            });
+
+        }
+    }
+
+    private void showCalibrationWindow(View view){
+        AlertDialog.Builder builder_cal = new AlertDialog.Builder(getActivity());
+        builder_cal.setView(view);
+        calibrationDialog = builder_cal.create();
+        calibrationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        calibrationDialog.setCanceledOnTouchOutside(false);
+        calibrationDialog.show();
+
+        CalibrationWindow calibrationWindow = new CalibrationWindow(view);
+        calibrationWindow.getViewElements();
 
     }
 
