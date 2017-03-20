@@ -10,8 +10,13 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.AsyncTaskMap;
 import com.phucphuong.noisesearch.Utilities.GPSTracker;
 import com.phucphuong.noisesearch.Utilities.SoundMeter;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 
 
 /**
@@ -24,6 +29,11 @@ public class MeterFragment extends Fragment {
         // Required empty public constructor
     }
 
+
+    //for map thread
+    MapView map;
+    IMapController iMapController;
+    Marker startMarker;
 
     SoundMeter soundMeter;
     double spl = 0;
@@ -60,6 +70,7 @@ public class MeterFragment extends Fragment {
                     //disable settings button
                     settingsFragment.setStateOfSettingsButtons(false);
                     if (mapFragment != null){
+                        //start asyncTask here
                         mapFragment.startGPSTracker();
                     }
                     soundMeter = new SoundMeter(handler, getActivity());
@@ -72,7 +83,7 @@ public class MeterFragment extends Fragment {
                     soundMeter.thread.interrupt();
                     soundMeter.logThread.interrupt();
 
-                    settingsFragment.setValuesText("Noise Search");
+                    settingsFragment.setValuesText("NOISE SEARCH");
 
                     //enable settings button
                     settingsFragment.setStateOfSettingsButtons(true);
@@ -97,6 +108,7 @@ public class MeterFragment extends Fragment {
                 settingsFragment.setValuesText(Double.toString(spl));
                 if (graphFragment != null){
                     graphFragment.addEntry(spl);
+
                 }
                 if (mapFragment != null){
                     mapFragment.drawOnFrament(location[0], location[1]);

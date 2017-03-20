@@ -70,7 +70,7 @@ public class GPSTracker extends Service implements LocationListener {
                 Toast.makeText(context, "No Service Provider Available", Toast.LENGTH_LONG).show();
             }else {
                 this.canGetLocation = true;
-                Toast.makeText(context, "GPS", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "GPS", Toast.LENGTH_SHORT).show();
 
                 try {
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 3.5f, this);

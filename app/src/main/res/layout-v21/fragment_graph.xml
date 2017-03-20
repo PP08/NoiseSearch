@@ -38,7 +38,6 @@
             app:layout_constraintRight_toRightOf="@+id/constraintLayout3"
             app:layout_constraintBottom_toBottomOf="@+id/constraintLayout3"
             android:layout_marginBottom="8dp" />
-
         <com.github.mikephil.charting.charts.LineChart
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -55,6 +54,8 @@
             app:layout_constraintBottom_toTopOf="@+id/tv_timer">
 
         </com.github.mikephil.charting.charts.LineChart>
-
     </android.support.constraint.ConstraintLayout>
+
+
+
 </android.support.constraint.ConstraintLayout>

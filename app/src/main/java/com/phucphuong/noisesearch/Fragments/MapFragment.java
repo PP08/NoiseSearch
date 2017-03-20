@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.AsyncTaskMap;
 import com.phucphuong.noisesearch.Utilities.GPSTracker;
 
 import org.osmdroid.api.IMapController;
@@ -18,6 +19,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
@@ -33,7 +37,6 @@ public class MapFragment extends Fragment {
 
     private MapView map;
     double longitude, latitude;
-    double newLongitude, newLatitude;
 
     public MapFragment() {
         // Required empty public constructor
@@ -53,10 +56,17 @@ public class MapFragment extends Fragment {
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
 
-        checkStartPoint();
-        setTheMarker(new GeoPoint(latitude, longitude), "Start Point");
+        //params for thread
+        IMapController iMapController = map.getController();
+        Marker startMarker = new Marker(map);
 
+        //        TODO: check this thread : done
 
+        AsyncTaskMap asyncTaskMap = new AsyncTaskMap(getActivity(), iMapController, startMarker);
+        asyncTaskMap.execute();
+
+        map.getOverlays().add(startMarker);
+        map.invalidate();
         return mapView;
     }
 
@@ -66,7 +76,6 @@ public class MapFragment extends Fragment {
         latitude = TempGPS.getLatitude();
         longitude = TempGPS.getLongitude();
         setStartPoint(latitude,longitude);
-        map.invalidate();
         TempGPS.stopUsingGPS();
     }
 
