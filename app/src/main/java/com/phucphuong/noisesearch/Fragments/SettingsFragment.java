@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.CalibrationHelper;
@@ -102,7 +103,7 @@ public class SettingsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 //                    TODO : show the fragment calibration
-                    parentDialog.dismiss();
+                    //parentDialog.dismiss();
                     showCalibrationWindow(calibrationWindow);
                 }
             });
@@ -117,16 +118,29 @@ public class SettingsFragment extends Fragment {
         calibrationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         calibrationDialog.setCanceledOnTouchOutside(false);
         calibrationDialog.show();
+        CalibrationWindow calibrationClass = new CalibrationWindow(view);
+        calibrationClass.getViewElements();
 
-        CalibrationWindow calibrationWindow = new CalibrationWindow(view);
-        calibrationWindow.getViewElements();
+        ImageButton btn_back = (ImageButton)view.findViewById(R.id.btn_back);
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(view.getContext(), "ok", Toast.LENGTH_SHORT).show();
+                calibrationDialog.dismiss();
+                ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
+                //calibrationDialog.
+                //showAlertDialog(settingWindow);
+            }
+        });
+
+        //calibrationWindow.getViewElements();
 
     }
-
     public void setValuesText(String text){
         tv_values.setText(text);
     }
     public void setStateOfSettingsButtons(boolean state){
         btn_settings.setEnabled(state);
     }
+
 }
