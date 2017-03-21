@@ -23,17 +23,12 @@ public class CalibrationWindow {
     ImageButton btn_minus, btn_plus;
 
     double spl = 0;
+    AsyncTaskCalibration asyncTaskCalibration;
 
 
     public CalibrationWindow(View view){
 
         this.view = view;
-
-    }
-
-    public void initialView(){
-
-//        TODO : add asyncTask thread here
 
     }
 
@@ -45,11 +40,14 @@ public class CalibrationWindow {
         btn_minus = (ImageButton)view.findViewById(R.id.btn_decrease);
         btn_plus = (ImageButton)view.findViewById(R.id.btn_increase);
 
+
+        asyncTaskCalibration = new AsyncTaskCalibration(tv_spl);
+        asyncTaskCalibration.execute();
+
         btn_minus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                spl -= 10;
-                tv_spl.setText(Double.toString(spl));
+
             }
         });
 
@@ -57,15 +55,17 @@ public class CalibrationWindow {
             @Override
             public void onClick(View v) {
 
-                spl += 10;
-                tv_spl.setText(Double.toString(spl));
-
             }
         });
 
+    }
 
-
-
-
+    public void terminateThread(){
+        asyncTaskCalibration.isRunning = false;
+        asyncTaskCalibration.thread.interrupt();
+        if (asyncTaskCalibration.recordInstance != null){
+            asyncTaskCalibration.recordInstance.release();
+        }
+        //asyncTaskCalibration.thread.interrupt();
     }
 }

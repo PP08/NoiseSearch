@@ -125,6 +125,10 @@ public class MeterFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        soundMeter.terminate();
+        //myThread.interrupt();
+        soundMeter.thread.interrupt();
+        soundMeter.logThread.interrupt();
     }
 
 }

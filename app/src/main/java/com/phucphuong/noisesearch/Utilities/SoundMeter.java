@@ -77,18 +77,13 @@ public class SoundMeter {
         @Override
         public void run() {
             initializeLog();
-
             while (logThreadShouldRun){
-
                 writeLog();
-
             }
         }
     }
 
     public Thread logThread = new Thread(new LogRunnable());
-
-
 
     public class MyRunable implements Runnable{
 
@@ -113,7 +108,6 @@ public class SoundMeter {
                     location = gpsTracker.lastLocation;
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
-                    //Log.e(errorTag, Double.toString(splValue));
                     sendMessage();
 
                 }

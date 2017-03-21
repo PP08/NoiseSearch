@@ -35,8 +35,10 @@ public class SettingsFragment extends Fragment {
     ImageButton btn_settings, btn_info;
     TextView tv_values;
     View settingsView, settingWindow, infoWindow, calibrationWindow;
-
     AlertDialog parentDialog, calibrationDialog;
+
+
+    CalibrationWindow calibrationClass;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -94,7 +96,6 @@ public class SettingsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 //                    TODO : show the fragment calibration
-                    //parentDialog.dismiss();
                     showCalibrationWindow(calibrationWindow);
                 }
             });
@@ -109,33 +110,38 @@ public class SettingsFragment extends Fragment {
         calibrationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         calibrationDialog.setCanceledOnTouchOutside(false);
 
+
+        //initial calibration window
+        calibrationClass = new CalibrationWindow(view);
+        calibrationClass.getViewElements();
+
+
+        // handle system's back button
         calibrationDialog.setOnKeyListener(new AlertDialog.OnKeyListener(){
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-
                 if (keyCode == KeyEvent.KEYCODE_BACK){
-                    calibrationDialog.dismiss();
-                    ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
+                    backButtonHandle();
                 }
                 return true;
             }
         });
 
-        calibrationDialog.show();
-        CalibrationWindow calibrationClass = new CalibrationWindow(view);
-        calibrationClass.getViewElements();
-
+        // handle dialog's back button
         ImageButton btn_back = (ImageButton)view.findViewById(R.id.btn_back);
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(view.getContext(), "ok", Toast.LENGTH_SHORT).show();
-                calibrationDialog.dismiss();
-                ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
-                //calibrationDialog.
-                //showAlertDialog(settingWindow);
+                backButtonHandle();
             }
         });
+
+
+
+        //show dialog when everything's done
+        calibrationDialog.show();
+
+
     }
 
 
@@ -146,4 +152,11 @@ public class SettingsFragment extends Fragment {
         btn_settings.setEnabled(state);
     }
 
+    public void backButtonHandle(){
+        calibrationClass.terminateThread();
+        calibrationDialog.dismiss();
+        if (((ViewGroup) calibrationWindow.getParent()) != null){
+            ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
+        }
+    }
 }
