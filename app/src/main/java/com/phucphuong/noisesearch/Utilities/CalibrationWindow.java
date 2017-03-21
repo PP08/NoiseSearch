@@ -1,4 +1,4 @@
-package com.phucphuong.noisesearch.Fragments;
+package com.phucphuong.noisesearch.Utilities;
 
 import android.app.FragmentManager;
 import android.view.View;

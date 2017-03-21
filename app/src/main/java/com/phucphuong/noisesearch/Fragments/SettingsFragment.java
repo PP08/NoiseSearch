@@ -1,31 +1,22 @@
 package com.phucphuong.noisesearch.Fragments;
 
 
-import android.app.Dialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
-import android.text.Layout;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.phucphuong.noisesearch.R;
-import com.phucphuong.noisesearch.Utilities.CalibrationHelper;
-
-import java.util.zip.Inflater;
+import com.phucphuong.noisesearch.Utilities.CalibrationWindow;
 
 
 /**
@@ -117,6 +108,19 @@ public class SettingsFragment extends Fragment {
         calibrationDialog = builder_cal.create();
         calibrationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         calibrationDialog.setCanceledOnTouchOutside(false);
+
+        calibrationDialog.setOnKeyListener(new AlertDialog.OnKeyListener(){
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+
+                if (keyCode == KeyEvent.KEYCODE_BACK){
+                    calibrationDialog.dismiss();
+                    ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
+                }
+                return true;
+            }
+        });
+
         calibrationDialog.show();
         CalibrationWindow calibrationClass = new CalibrationWindow(view);
         calibrationClass.getViewElements();
@@ -132,10 +136,9 @@ public class SettingsFragment extends Fragment {
                 //showAlertDialog(settingWindow);
             }
         });
-
-        //calibrationWindow.getViewElements();
-
     }
+
+
     public void setValuesText(String text){
         tv_values.setText(text);
     }
