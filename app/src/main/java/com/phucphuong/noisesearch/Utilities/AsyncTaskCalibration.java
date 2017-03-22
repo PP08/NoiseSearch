@@ -25,13 +25,14 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
     boolean isRunning;
     Thread thread;
     double splValue = 0.0;
-    double calbirationValue;
+    float calibrationValue;
 
     TextView textView;
 
-    public AsyncTaskCalibration(TextView tv, double calbirationValue){
+    public AsyncTaskCalibration(TextView tv, float calibrationValue){
         this.textView = tv;
-        this.calbirationValue = calbirationValue;
+        this.calibrationValue = calibrationValue;
+
     }
 
     @Override
@@ -60,6 +61,7 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
     protected void onProgressUpdate(Double... values) {
         super.onProgressUpdate(values);
         textView.setText(Double.toString(splValue));
+//        TODO: calirate the value
     }
 
     @Override
@@ -78,14 +80,18 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
                 Log.e("State", Integer.toString(recordInstance.getState()));
                 recordInstance.startRecording();
                 short[] temBuffer = new short[BUFFSIZE];
-                while (isRunning) {
+                while (isRunning){
                     splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
-                    splValue += calbirationValue;
+                    splValue += (double)calibrationValue;
                     publishProgress(splValue);
                 }
                 if (recordInstance.getState() == 1){
-                    recordInstance.stop();
-                    recordInstance.release();
+                    try {
+                        recordInstance.stop();
+                        recordInstance.release();
+                    }catch (Exception ignored){
+
+                    }
                 }
             } catch (Exception e) {
                 Log.e("MY TAG: ", "FAILUREEEEEEEEEEEE");

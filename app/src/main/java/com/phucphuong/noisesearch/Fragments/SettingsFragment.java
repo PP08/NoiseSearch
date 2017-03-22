@@ -1,12 +1,15 @@
 package com.phucphuong.noisesearch.Fragments;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +31,6 @@ public class SettingsFragment extends Fragment {
     public SettingsFragment() {
         // Required empty public constructor
     }
-
-    double calValue = 0;
 //    TODO: implement the calibration using AsyncTask
 
     ImageButton btn_settings, btn_info;
@@ -37,6 +38,8 @@ public class SettingsFragment extends Fragment {
     View settingsView, settingWindow, infoWindow, calibrationWindow;
     AlertDialog parentDialog, calibrationDialog;
 
+    float calirationValue;
+    SharedPreferences sharedPref;
 
     CalibrationWindow calibrationClass;
 
@@ -112,7 +115,8 @@ public class SettingsFragment extends Fragment {
 
 
         //initial calibration window
-        calibrationClass = new CalibrationWindow(view);
+        calirationValue = readPref();
+        calibrationClass = new CalibrationWindow(view, calirationValue);
         calibrationClass.getViewElements();
 
 
@@ -136,8 +140,6 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-
-
         //show dialog when everything's done
         calibrationDialog.show();
 
@@ -155,8 +157,22 @@ public class SettingsFragment extends Fragment {
     public void backButtonHandle(){
         calibrationClass.terminateThread();
         calibrationDialog.dismiss();
-        if (((ViewGroup) calibrationWindow.getParent()) != null){
+        if (calibrationWindow.getParent() != null){
             ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
         }
+        writePref();
+    }
+
+    //for calibration
+    public void writePref(){
+        sharedPref = getActivity().getSharedPreferences("calibration_value",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putFloat("calValue", calibrationClass.calibrationValue);
+        editor.commit();
+    }
+
+    public float readPref(){
+        sharedPref = getActivity().getSharedPreferences("calibration_value", Context.MODE_PRIVATE);
+        return sharedPref.getFloat("calValue", 0f);
     }
 }

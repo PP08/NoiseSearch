@@ -1,5 +1,7 @@
 package com.phucphuong.noisesearch.Fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -73,7 +75,8 @@ public class MeterFragment extends Fragment {
                         //start asyncTask here
                         mapFragment.startGPSTracker();
                     }
-                    soundMeter = new SoundMeter(handler, getActivity());
+                    float calibrationValue = settingsFragment.readPref();
+                    soundMeter = new SoundMeter(handler, getActivity(), calibrationValue);
                     soundMeter.thread.start();
 
                 }else {
@@ -125,10 +128,12 @@ public class MeterFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        soundMeter.terminate();
-        //myThread.interrupt();
-        soundMeter.thread.interrupt();
-        soundMeter.logThread.interrupt();
-    }
 
+        if (soundMeter != null) {
+            if (soundMeter.thread.isAlive())
+                soundMeter.terminate();
+                soundMeter.thread.interrupt();
+                soundMeter.logThread.interrupt();
+        }
+    }
 }

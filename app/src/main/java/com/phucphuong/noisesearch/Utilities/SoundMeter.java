@@ -46,7 +46,7 @@ public class SoundMeter {
 
     //for SPL calculation
     double splValue = 0.0;
-    int calibrationValue;
+    float calibrationValue;
 
 
     //for location
@@ -64,9 +64,10 @@ public class SoundMeter {
     //for testing
     String errorTag = "has an error: ";
 
-    public SoundMeter(Handler h, Context context) {
+    public SoundMeter(Handler h, Context context, float calValue) {
         this.handler = h;
         this.context = context;
+        this.calibrationValue = calValue;
         gpsTracker = new GPSTracker(context);
         logThread.start();
     }
@@ -150,6 +151,7 @@ public class SoundMeter {
         rsmValue = Math.sqrt(rsmValue);
         spl = 10 * Math.log10(rsmValue/BUFFSIZE) + 94;
         spl = Math.round(spl);
+        spl += (double)calibrationValue;
         return  spl;
     }
 
