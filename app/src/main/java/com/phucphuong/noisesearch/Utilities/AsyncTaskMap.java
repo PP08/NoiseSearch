@@ -21,9 +21,6 @@ import org.osmdroid.views.overlay.Marker;
 public class AsyncTaskMap extends AsyncTask<Void, Void, double[]> {
 
     Activity activity;
-
-    TextView test;
-
     MapView map;
     GPSTracker TempGPS;
     IMapController iMapController;

@@ -41,12 +41,13 @@ public class SoundMeter {
     int sampleRateInHz = 44100;
     private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    private int BUFFSIZE = sampleRateInHz * 4; //320 - default
+    private int BUFFSIZE; //320 - default
     //private int BUFFSIZE = sampleRateInHz * 2;
 
     //for SPL calculation
     double splValue = 0.0;
     float calibrationValue;
+    boolean speedMode;
 
 
     //for location
@@ -64,10 +65,11 @@ public class SoundMeter {
     //for testing
     String errorTag = "has an error: ";
 
-    public SoundMeter(Handler h, Context context, float calValue) {
+    public SoundMeter(Handler h, Context context, float calValue, boolean speedMode) {
         this.handler = h;
         this.context = context;
         this.calibrationValue = calValue;
+        this.speedMode = speedMode;
         gpsTracker = new GPSTracker(context);
         logThread.start();
     }
@@ -90,6 +92,12 @@ public class SoundMeter {
 
         @Override
         public void run() {
+
+            if (speedMode){
+                BUFFSIZE = sampleRateInHz * 2;
+            }else {
+                BUFFSIZE = sampleRateInHz * 4;
+            }
 
             try {
                 Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);

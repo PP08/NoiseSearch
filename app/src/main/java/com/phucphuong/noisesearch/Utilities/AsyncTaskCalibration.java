@@ -22,17 +22,17 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
     private static int ENCODING;
     private static int CHANNEL;
     private int BUFFSIZE;
-    boolean isRunning;
+    boolean isRunning, speedMode;
     Thread thread;
     double splValue = 0.0;
     float calibrationValue;
 
     TextView textView;
 
-    public AsyncTaskCalibration(TextView tv, float calibrationValue){
+    public AsyncTaskCalibration(TextView tv, float calibrationValue, boolean speedMode){
         this.textView = tv;
         this.calibrationValue = calibrationValue;
-
+        this.speedMode = speedMode;
     }
 
     @Override
@@ -41,7 +41,11 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
         sampleRateInHz = 44100;
         ENCODING = AudioFormat.ENCODING_PCM_16BIT;
         CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-        BUFFSIZE = sampleRateInHz * 4;
+        if (speedMode){
+            BUFFSIZE = sampleRateInHz * 2;
+        }else {
+            BUFFSIZE = sampleRateInHz * 4;
+        }
         isRunning = true;
         if (recordInstance != null){
             recordInstance.release();
@@ -81,6 +85,7 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
                 recordInstance.startRecording();
                 short[] temBuffer = new short[BUFFSIZE];
                 while (isRunning){
+                    Log.e("test", "test");
                     splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
                     splValue += (double)calibrationValue;
                     publishProgress(splValue);

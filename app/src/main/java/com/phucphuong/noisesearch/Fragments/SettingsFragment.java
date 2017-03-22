@@ -40,6 +40,7 @@ public class SettingsFragment extends Fragment {
 
     float calirationValue;
     SharedPreferences sharedPref;
+    boolean speedMode;
 
     CalibrationWindow calibrationClass;
 
@@ -115,8 +116,8 @@ public class SettingsFragment extends Fragment {
 
 
         //initial calibration window
-        calirationValue = readPref();
-        calibrationClass = new CalibrationWindow(view, calirationValue);
+        readPref();
+        calibrationClass = new CalibrationWindow(view, calirationValue, speedMode);
         calibrationClass.getViewElements();
 
 
@@ -165,14 +166,16 @@ public class SettingsFragment extends Fragment {
 
     //for calibration
     public void writePref(){
-        sharedPref = getActivity().getSharedPreferences("calibration_value",Context.MODE_PRIVATE);
+        sharedPref = getActivity().getSharedPreferences("settings",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putFloat("calValue", calibrationClass.calibrationValue);
-        editor.commit();
+        editor.putBoolean("speedMode", calibrationClass.speedMode);
+        editor.apply();
     }
 
-    public float readPref(){
-        sharedPref = getActivity().getSharedPreferences("calibration_value", Context.MODE_PRIVATE);
-        return sharedPref.getFloat("calValue", 0f);
+    public void readPref(){
+        sharedPref = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        this.calirationValue = sharedPref.getFloat("calValue", 0f);
+        this.speedMode = sharedPref.getBoolean("speedMode", false);
     }
 }

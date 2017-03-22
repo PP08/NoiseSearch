@@ -1,18 +1,13 @@
 package com.phucphuong.noisesearch.Utilities;
 
-import android.app.FragmentManager;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.phucphuong.noisesearch.R;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by phucphuong on 3/21/17.
@@ -20,24 +15,21 @@ import org.w3c.dom.Text;
 
 public class CalibrationWindow {
 
-
     View view;
     TextView tv_spl;
     ImageButton btn_minus, btn_plus;
+    SwitchCompat sw_fastMode;
+    static Boolean isTouched = false;
 
     public float calibrationValue;
+    public boolean speedMode;
     AsyncTaskCalibration asyncTaskCalibration;
 
-
-    String arr[]={
-            "Slow",
-            "Fast"};
-
-
-    public CalibrationWindow(View view, float calibrationValue){
+    public CalibrationWindow(View view, float calibrationValue, boolean speedMode){
 
         this.view = view;
         this.calibrationValue = calibrationValue;
+        this.speedMode = speedMode;
     }
 
     public void getViewElements(){
@@ -48,8 +40,9 @@ public class CalibrationWindow {
         btn_minus = (ImageButton)view.findViewById(R.id.btn_decrease);
         btn_plus = (ImageButton)view.findViewById(R.id.btn_increase);
 
+        sw_fastMode = (SwitchCompat)view.findViewById(R.id.sw_fastMode);
 
-        asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue);
+        asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue, speedMode);
         asyncTaskCalibration.execute();
 
         btn_minus.setOnClickListener(new View.OnClickListener() {
@@ -67,16 +60,55 @@ public class CalibrationWindow {
             }
         });
 
+        if (speedMode){
+            sw_fastMode.setChecked(true);
+        }
+
+        //switchcompat
+        sw_fastMode.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                isTouched = true;
+                return false;
+            }
+        });
+
+        sw_fastMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (isTouched) {
+                    isTouched = false;
+                    if (isChecked) {
+                        terminateThread();
+                        asyncTaskCalibration.cancel(true);
+                        speedMode = true;
+                        asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue, speedMode);
+                        asyncTaskCalibration.execute();
+                    }
+                    else {
+
+                        terminateThread();
+                        asyncTaskCalibration.cancel(true);
+                        speedMode = false;
+                        asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue, speedMode);
+                        asyncTaskCalibration.execute();
+                    }
+                }
+            }
+        });
+
+
     }
 
     public void terminateThread(){
         calibrationValue = asyncTaskCalibration.calibrationValue;
-        Log.e("new calibration value", Float.toString(asyncTaskCalibration.calibrationValue));
+        speedMode = asyncTaskCalibration.speedMode;
         asyncTaskCalibration.isRunning = false;
         asyncTaskCalibration.thread.interrupt();
         if (asyncTaskCalibration.recordInstance != null){
             asyncTaskCalibration.recordInstance.release();
         }
-        //asyncTaskCalibration.thread.interrupt();
     }
 }

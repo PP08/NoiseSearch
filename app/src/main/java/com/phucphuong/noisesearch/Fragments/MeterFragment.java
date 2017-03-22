@@ -75,8 +75,8 @@ public class MeterFragment extends Fragment {
                         //start asyncTask here
                         mapFragment.startGPSTracker();
                     }
-                    float calibrationValue = settingsFragment.readPref();
-                    soundMeter = new SoundMeter(handler, getActivity(), calibrationValue);
+                    settingsFragment.readPref();
+                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode);
                     soundMeter.thread.start();
 
                 }else {
