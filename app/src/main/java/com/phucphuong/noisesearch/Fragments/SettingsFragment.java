@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -99,10 +100,21 @@ public class SettingsFragment extends Fragment {
             btn_calibration.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    TODO : show the fragment calibration
+//                    TODO : show the calibration fragment
                     showCalibrationWindow(calibrationWindow);
                 }
             });
+
+
+            Button btn_filemanager = (Button)mview.findViewById(R.id.btn_fileManager);
+            btn_filemanager.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    TODO: show the filemanager fragment  here
+                    showFileManagerDialog();
+                }
+            });
+
 
         }
     }
@@ -177,5 +189,14 @@ public class SettingsFragment extends Fragment {
         sharedPref = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         this.calirationValue = sharedPref.getFloat("calValue", 0f);
         this.speedMode = sharedPref.getBoolean("speedMode", false);
+    }
+
+
+    //for filemanager
+
+    public void showFileManagerDialog(){
+        FragmentManager fragment = getFragmentManager();
+        FileManagerFragment filemanger = FileManagerFragment.newInstance();
+        filemanger.show(fragment, "fragment file");
     }
 }
