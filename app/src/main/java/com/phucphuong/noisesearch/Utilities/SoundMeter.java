@@ -61,7 +61,7 @@ public class SoundMeter {
     double latitude, longitude;
 
     //for log
-    private String FILENAME = "";
+    public String FILENAME = "";
     private String device_id = "";
     private String timeStamp;
     private DateFormat timeStampFormat = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss.SSS");

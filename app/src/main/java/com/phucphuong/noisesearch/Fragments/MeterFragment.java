@@ -1,11 +1,15 @@
 package com.phucphuong.noisesearch.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +17,20 @@ import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskMap;
+import com.phucphuong.noisesearch.Utilities.FileManagerHelper;
 import com.phucphuong.noisesearch.Utilities.GPSTracker;
 import com.phucphuong.noisesearch.Utilities.SoundMeter;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -85,11 +97,11 @@ public class MeterFragment extends Fragment {
                     //myThread.interrupt();
                     soundMeter.thread.interrupt();
                     soundMeter.logThread.interrupt();
-
                     settingsFragment.setValuesText("NOISE SEARCH");
-
                     //enable settings button
                     settingsFragment.setStateOfSettingsButtons(true);
+
+                    sentFileToServer();
 
                 }
             }
@@ -136,4 +148,59 @@ public class MeterFragment extends Fragment {
                 soundMeter.logThread.interrupt();
         }
     }
+
+    private void sentFileToServer(){
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+        alert.setTitle("Send File To Server");
+        alert.setMessage("Do you want to send this file to server?");
+        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                File fileDirUnsent = new File(getContext().getFilesDir() + "/Unsent Files");
+                fileDirUnsent.mkdirs();
+                File fileDirSent = new File(getContext().getFilesDir() + "/Sent Files");
+                fileDirSent.mkdirs();
+                File src = new File(fileDirUnsent, soundMeter.FILENAME);
+                File dst = new File(fileDirSent, soundMeter.FILENAME);
+                try {
+                    copy(src, dst);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //delete after sent to server
+                String source = getContext().getFilesDir().toString() + "/Unsent Files/" + soundMeter.FILENAME;
+                File delFile = new File(source);
+                delFile.delete();
+                dialog.dismiss();
+            }
+        });
+
+        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+    }
+
+    public void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
+
 }

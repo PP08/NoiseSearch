@@ -104,10 +104,6 @@ public class FileManager extends AppCompatActivity {
             fragmentTitleList.add(title);
         }
 
-//        @Override
-//        public int getItemPosition(Object object) {
-//            return POSITION_NONE;
-//        }
     }
 
     @Override

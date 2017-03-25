@@ -57,9 +57,6 @@ public class UnsentFragment extends Fragment {
         btn_deleteFile = (Button)view.findViewById(R.id.btn_delete);
 
         final List<String> data = new ArrayList<>();
-        for (int i = 0; i < 100; i++){
-            data.add("Item " + i);
-        }
 
         directory = getContext().getFilesDir().toString() + "/Unsent Files";
 
@@ -139,7 +136,6 @@ public class UnsentFragment extends Fragment {
                 alert.show();
             }
         });
-
         return view;
     }
 }
