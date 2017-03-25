@@ -24,7 +24,7 @@ public class AsyncTaskMap extends AsyncTask<Void, Void, double[]> {
     MapView map;
     GPSTracker TempGPS;
     IMapController iMapController;
-    Marker startMarker;
+    public Marker startMarker;
 
     public AsyncTaskMap(Activity activity, IMapController mapController, Marker startMarker){
         this.activity = activity;
@@ -51,7 +51,6 @@ public class AsyncTaskMap extends AsyncTask<Void, Void, double[]> {
     @Override
     protected void onPostExecute(double[] point) {
         super.onPostExecute(point);
-        //Log.e("lajfladfjal;fjalfjdlsf", Double.toString(point[0]) + ", " + Double.toString(point[1]));
         setStartPoint(point[0], point[1]);
         TempGPS.stopUsingGPS();
 
@@ -61,7 +60,10 @@ public class AsyncTaskMap extends AsyncTask<Void, Void, double[]> {
         iMapController.setZoom(40);
         GeoPoint startPoint = new GeoPoint(x, y);
         iMapController.animateTo(startPoint);
+        startMarker.setTitle("Your current location");
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
     }
+
+
 }

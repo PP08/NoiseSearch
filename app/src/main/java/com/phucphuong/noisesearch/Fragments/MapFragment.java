@@ -3,6 +3,7 @@ package com.phucphuong.noisesearch.Fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,13 +50,19 @@ public class MapFragment extends Fragment {
         // Inflate the layout for this fragment
         View mapView = inflater.inflate(R.layout.fragment_map, container, true);
 
+        return mapView;
+    }
 
-        map = (MapView)mapView.findViewById(R.id.map);
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        map = (MapView)view.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
 
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-
         //params for thread
         IMapController iMapController = map.getController();
         Marker startMarker = new Marker(map);
@@ -65,9 +72,9 @@ public class MapFragment extends Fragment {
         AsyncTaskMap asyncTaskMap = new AsyncTaskMap(getActivity(), iMapController, startMarker);
         asyncTaskMap.execute();
 
-        map.getOverlays().add(startMarker);
+        map.getOverlays().add(asyncTaskMap.startMarker);
         map.invalidate();
-        return mapView;
+
     }
 
     private void checkStartPoint(){

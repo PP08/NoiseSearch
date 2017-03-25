@@ -3,12 +3,14 @@ package com.phucphuong.noisesearch.Fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,8 +21,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.phucphuong.noisesearch.Activities.FileManager;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.CalibrationWindow;
+
+import java.io.File;
 
 
 /**
@@ -195,8 +200,7 @@ public class SettingsFragment extends Fragment {
     //for filemanager
 
     public void showFileManagerDialog(){
-        FragmentManager fragment = getFragmentManager();
-        FileManagerFragment filemanger = FileManagerFragment.newInstance();
-        filemanger.show(fragment, "fragment file");
+        Intent intent = new Intent(getContext(), FileManager.class);
+        startActivity(intent);
     }
 }

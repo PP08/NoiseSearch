@@ -15,9 +15,13 @@ import android.util.Log;
 
 import com.phucphuong.noisesearch.Fragments.MapFragment;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -79,7 +83,11 @@ public class SoundMeter {
 
         @Override
         public void run() {
-            initializeLog();
+            try {
+                initializeLog();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             while (logThreadShouldRun){
                 writeLog();
             }
@@ -125,7 +133,7 @@ public class SoundMeter {
                 gpsTracker.stopUsingGPS();
 
             } catch (Exception e) {
-                Log.e("MY TAG: ", "FAILUREEEEEEEEEEEE");
+                Log.e("test", "FAILUREEEEEEEEEEEE");
                 e.printStackTrace();
             }
         }
@@ -168,22 +176,20 @@ public class SoundMeter {
     }
 
 
-    public void initializeLog(){
+    public void initializeLog() throws IOException {
 
         device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         setFileName(); // log's name
         String header = "Device ID" + "," + "Timestamp" + "," + "Pressure" + "," + "Latitude" + "," + "Longitude" + "\n"; //set header for columns
-        FileOutputStream out = null;
-        try {
-            out = context.openFileOutput(FILENAME, Context.MODE_APPEND);
-            out.write(header.getBytes());
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+        File fileDir = new File(context.getFilesDir() + "/Unsent Files");
+        fileDir.mkdirs();
+
+        File file = new File(fileDir, FILENAME);
+        FileOutputStream stream = new FileOutputStream(file);
+
+        stream.write(header.getBytes());
+        stream.close();
     }
 
     public void setFileName(){
@@ -204,9 +210,11 @@ public class SoundMeter {
         String data;
         data = device_id + "," + timeStamp + "," + Double.toString(splValue) + "," + Double.toString(longitude) + "," + Double.toString(latitude) +"\n";
         try{
-            FileOutputStream out = context.openFileOutput(FILENAME, Context.MODE_APPEND);
-            out.write(data.getBytes());
-            out.close();
+            File fileDir = new File(context.getFilesDir() + "/Unsent Files");
+            File file = new File(fileDir, FILENAME);
+            FileOutputStream stream = new FileOutputStream(file, true);
+            stream.write(data.getBytes());
+            stream.close();
 
         }catch (Exception e){
             e.printStackTrace();
@@ -221,5 +229,4 @@ public class SoundMeter {
         timeStamp = timeStampFormat.format(calendar.getTime());
         notify();
     }
-
 }
