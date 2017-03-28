@@ -1,6 +1,7 @@
 package com.phucphuong.noisesearch.Fragments;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -51,12 +52,13 @@ public class MeterFragment extends Fragment {
     public MapFragment mapFragment;
 
     private String prefix;
+    View meterView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View meterView = inflater.inflate(R.layout.fragment_meter, container, true);
+        meterView = inflater.inflate(R.layout.fragment_meter, container, true);
         ToggleButton btn_start_stop = (ToggleButton)meterView.findViewById(R.id.btn_start_stop);
 
         //fragment settings
@@ -157,6 +159,13 @@ public class MeterFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                dialog.dismiss();
+                final ProgressDialog[] progressDialog = new ProgressDialog[1];
+                progressDialog[0] = new ProgressDialog(getContext());
+                progressDialog[0].setTitle("Uploading");
+                progressDialog[0].setMessage("Please wait...");
+                progressDialog[0].show();
+
                 File fileDirUnsent = new File(getContext().getFilesDir() + "/Unsent Files");
                 fileDirUnsent.mkdirs();
                 File fileDirSent = new File(getContext().getFilesDir() + "/Sent Files");
@@ -166,7 +175,22 @@ public class MeterFragment extends Fragment {
 
                 UploadFile uploadFile = new UploadFile(src, dst, getView(), prefix);
                 uploadFile.uploadFileToserver();
-                dialog.dismiss();
+
+                if (!uploadFile.finish){
+                    progressDialog[0].dismiss();
+                    if (!uploadFile.success){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                        alert.setTitle("Cannot upload files");
+                        alert.setMessage("Cannot connect to the server at this moment, please try again in the next time");
+                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        alert.show();
+                    }
+                }
             }
         });
 

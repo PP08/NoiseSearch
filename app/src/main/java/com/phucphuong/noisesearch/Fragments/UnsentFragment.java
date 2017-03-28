@@ -2,7 +2,9 @@ package com.phucphuong.noisesearch.Fragments;
 
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -30,16 +32,18 @@ public class UnsentFragment extends Fragment {
     //
     private String directory, source;
     public FileManagerHelper fileManagerHelper;
+    ArrayList<UploadFile> arrayClasses = new ArrayList<UploadFile>();
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
 
     //
     String prefix;
+    int amount_of_files = 0;
+    boolean shouldContinue = true;
+
 
     public UnsentFragment() {
         // Required empty public constructor
     }
-
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,8 +55,6 @@ public class UnsentFragment extends Fragment {
         btn_sendFile = (Button)view.findViewById(R.id.btn_send);
         btn_deleteFile = (Button)view.findViewById(R.id.btn_delete);
 
-        final List<String> data = new ArrayList<>();
-
         directory = getContext().getFilesDir().toString() + "/Unsent Files";
 
         fileManagerHelper = new FileManagerHelper(directory, view);
@@ -60,10 +62,14 @@ public class UnsentFragment extends Fragment {
         fileManagerHelper.refreshFileList();
 
         //for progress dialog
-
         btn_sendFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                progressDialog[0] = new ProgressDialog(view.getContext());
+                progressDialog[0].setTitle("Uploading");
+                progressDialog[0].setMessage("Please wait...");
+                progressDialog[0].show();
 
                 SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
                 File fileDirUnsent = new File(getContext().getFilesDir() + "/Unsent Files");
@@ -74,6 +80,8 @@ public class UnsentFragment extends Fragment {
                 for (int i = 0; i < listView.getCount(); i++){
                     if (sparseBooleanArray.get(i)){
 
+                        amount_of_files++;
+
                         File src = new File(fileDirUnsent, listView.getItemAtPosition(i).toString());
                         File dst = new File(fileDirSent, listView.getItemAtPosition(i).toString());
                         String file_path = src.getAbsolutePath();
@@ -83,12 +91,16 @@ public class UnsentFragment extends Fragment {
                         }else{
                             prefix = "multiple";
                         }
-                        UploadFile uploadFile = new UploadFile(src, dst, view, prefix);
-                        uploadFile.uploadFileToserver();
+                        arrayClasses.add(new UploadFile(src, dst, view, prefix));
+                        arrayClasses.get(arrayClasses.size() - 1).uploadFileToserver();
+//                        uploadFile =
+//                        uploadFile.uploadFileToserver();
                     }
                 }
 
-                fileManagerHelper.refreshFileList();
+                //asynctask here
+                AlertDialogAsyncTask alertDialogAsyncTask = new AlertDialogAsyncTask();
+                alertDialogAsyncTask.execute();
 
             }
         });
@@ -132,5 +144,52 @@ public class UnsentFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public static boolean isAllTaskFinished(ArrayList<UploadFile> arraylist) {
+        for (UploadFile uploadFile : arraylist) {
+            if (!uploadFile.finish) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public class AlertDialogAsyncTask extends AsyncTask<Void, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            while(shouldContinue) {
+                if (isAllTaskFinished(arrayClasses)) {
+                    shouldContinue = false;
+                    if (!arrayClasses.get(0).success){
+                        return false;
+                    }
+                }
+            }
+            arrayClasses = new ArrayList<UploadFile>();
+            shouldContinue = true;
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            progressDialog[0].dismiss();
+            if (!aBoolean){
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Cannot upload files");
+                alert.setMessage("Cannot connect to the server at this moment, please try again in the next time");
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
+            }else {
+                fileManagerHelper.refreshFileList();
+            }
+        }
     }
 }

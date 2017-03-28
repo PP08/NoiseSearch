@@ -38,7 +38,8 @@
         <activity
             android:name=".Activities.MeasureAtMultiPoints"
             android:screenOrientation="portrait" />
-        <activity android:name=".Activities.FileManager"></activity>
+        <activity android:name=".Activities.FileManager"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

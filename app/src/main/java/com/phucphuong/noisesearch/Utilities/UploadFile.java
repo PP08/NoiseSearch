@@ -36,7 +36,7 @@ public class UploadFile {
     String file_name;
     String directory;
     FileManagerHelper fileManagerHelper;
-    final ProgressDialog[] progressDialog = new ProgressDialog[1];
+    public boolean finish, success;
 
     public UploadFile(File src, File dst, View view, String file_name){
 
@@ -45,10 +45,9 @@ public class UploadFile {
         this.view = view;
         this.listView = (ListView)view.findViewById(R.id.listView);
         this.file_name = file_name;
-
         this.directory = view.getContext().getFilesDir().toString() + "/Unsent Files";
         this.fileManagerHelper = new FileManagerHelper(directory, view);
-
+        this.success = false;
     }
 
     public void uploadFileToserver(){
@@ -93,10 +92,7 @@ public class UploadFile {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog[0] = new ProgressDialog(view.getContext());
-            progressDialog[0].setTitle("Uploading");
-            progressDialog[0].setMessage("Please wait...");
-            progressDialog[0].show();
+
         }
 
         @Override
@@ -113,11 +109,8 @@ public class UploadFile {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
+            finish = true;
             if (aBoolean){
-
-                if (listView != null){
-                    fileManagerHelper.refreshFileList();
-                }
                 try {
                     fileManagerHelper.copy(src, dst);
                 } catch (IOException e) {
@@ -125,19 +118,10 @@ public class UploadFile {
                 }
                 File delFile = new File(path);
                 delFile.delete();
-                progressDialog[0].dismiss();
+                success = true;
+
             }else {
-                progressDialog[0].dismiss();
-                AlertDialog.Builder alert = new AlertDialog.Builder(view.getContext());
-                alert.setTitle("Cannot upload files");
-                alert.setMessage("Cannot connect to the server at this moment, please try again next time");
-                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alert.show();
+                success = false;
             }
         }
     }
