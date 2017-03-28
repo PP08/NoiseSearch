@@ -20,6 +20,7 @@ import com.phucphuong.noisesearch.Utilities.AsyncTaskMap;
 import com.phucphuong.noisesearch.Utilities.FileManagerHelper;
 import com.phucphuong.noisesearch.Utilities.GPSTracker;
 import com.phucphuong.noisesearch.Utilities.SoundMeter;
+import com.phucphuong.noisesearch.Utilities.UploadFile;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.views.MapView;
@@ -43,17 +44,13 @@ public class MeterFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-    //for map thread
-    MapView map;
-    IMapController iMapController;
-    Marker startMarker;
-
     SoundMeter soundMeter;
     double spl = 0;
     public SettingsFragment settingsFragment;
     public GraphFragment graphFragment;
     public MapFragment mapFragment;
+
+    private String prefix;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,8 +70,10 @@ public class MeterFragment extends Fragment {
 
         if (graphFragment != null){
             graphFragment.initializeLineChart();
+            prefix = "single";
+        }else {
+            prefix = "multiple";
         }
-
 
         btn_start_stop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -88,7 +87,7 @@ public class MeterFragment extends Fragment {
                         mapFragment.startGPSTracker();
                     }
                     settingsFragment.readPref();
-                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode);
+                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
                     soundMeter.thread.start();
 
                 }else {
@@ -164,16 +163,9 @@ public class MeterFragment extends Fragment {
                 fileDirSent.mkdirs();
                 File src = new File(fileDirUnsent, soundMeter.FILENAME);
                 File dst = new File(fileDirSent, soundMeter.FILENAME);
-                try {
-                    copy(src, dst);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-                //delete after sent to server
-                String source = getContext().getFilesDir().toString() + "/Unsent Files/" + soundMeter.FILENAME;
-                File delFile = new File(source);
-                delFile.delete();
+                UploadFile uploadFile = new UploadFile(src, dst, getView(), prefix);
+                uploadFile.uploadFileToserver();
                 dialog.dismiss();
             }
         });
@@ -188,19 +180,4 @@ public class MeterFragment extends Fragment {
 
         alert.show();
     }
-
-    public void copy(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
-
-        // Transfer bytes from in to out
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
-    }
-
 }

@@ -66,14 +66,16 @@ public class SoundMeter {
     private String timeStamp;
     private DateFormat timeStampFormat = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss.SSS");
 
+    private String prefix;
     //for testing
     String errorTag = "has an error: ";
 
-    public SoundMeter(Handler h, Context context, float calValue, boolean speedMode) {
+    public SoundMeter(Handler h, Context context, float calValue, boolean speedMode, String prefix) {
         this.handler = h;
         this.context = context;
         this.calibrationValue = calValue;
         this.speedMode = speedMode;
+        this.prefix = prefix;
         gpsTracker = new GPSTracker(context);
         logThread.start();
     }
@@ -196,7 +198,7 @@ public class SoundMeter {
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         String date = df.format(Calendar.getInstance().getTime());
-        FILENAME = date + ".csv";
+        FILENAME = prefix + "-" + date + ".csv";
     }
 
     public synchronized void writeLog(){

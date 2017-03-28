@@ -10,26 +10,16 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.FileManagerHelper;
+import com.phucphuong.noisesearch.Utilities.UploadFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -41,16 +31,21 @@ public class UnsentFragment extends Fragment {
     private String directory, source;
     public FileManagerHelper fileManagerHelper;
 
+    //
+    String prefix;
+
     public UnsentFragment() {
         // Required empty public constructor
     }
+
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_unsent, container, false);
+        final View view = inflater.inflate(R.layout.fragment_unsent, container, false);
 
         listView = (ListView)view.findViewById(R.id.listView);
         btn_sendFile = (Button)view.findViewById(R.id.btn_send);
@@ -60,19 +55,17 @@ public class UnsentFragment extends Fragment {
 
         directory = getContext().getFilesDir().toString() + "/Unsent Files";
 
-        fileManagerHelper = new FileManagerHelper(getContext(), listView, directory, btn_deleteFile);
+        fileManagerHelper = new FileManagerHelper(directory, view);
 
         fileManagerHelper.refreshFileList();
+
+        //for progress dialog
 
         btn_sendFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
-
-                String itemsSelected = "";
-                Log.e("test", "Total number selected: " + listView.getCheckedItemCount());
-
                 File fileDirUnsent = new File(getContext().getFilesDir() + "/Unsent Files");
                 fileDirUnsent.mkdirs();
                 File fileDirSent = new File(getContext().getFilesDir() + "/Sent Files");
@@ -83,21 +76,20 @@ public class UnsentFragment extends Fragment {
 
                         File src = new File(fileDirUnsent, listView.getItemAtPosition(i).toString());
                         File dst = new File(fileDirSent, listView.getItemAtPosition(i).toString());
-
-                        try {
-                            fileManagerHelper.copy(src, dst);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        String file_path = src.getAbsolutePath();
+                        String file_name = file_path.substring(file_path.lastIndexOf("/")+1);
+                        if (file_name.contains("single")){
+                            prefix = "single";
+                        }else{
+                            prefix = "multiple";
                         }
-                        //delete file after copied
-                        source = getContext().getFilesDir().toString() + "/Unsent Files/" + listView.getItemAtPosition(i).toString();
-                        File delFile = new File(source);
-                        delFile.delete();
-
+                        UploadFile uploadFile = new UploadFile(src, dst, view, prefix);
+                        uploadFile.uploadFileToserver();
                     }
                 }
 
                 fileManagerHelper.refreshFileList();
+
             }
         });
 
@@ -116,6 +108,9 @@ public class UnsentFragment extends Fragment {
                         for (int i = 0; i < listView.getCount(); i++){
                             if (sparseBooleanArray.get(i)){
                                 source = getContext().getFilesDir().toString() + "/Unsent Files/" + listView.getItemAtPosition(i).toString();
+
+                                Log.e("path pref", source);
+
                                 File delFile = new File(source);
                                 delFile.delete();
                             }

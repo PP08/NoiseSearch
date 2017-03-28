@@ -32,7 +32,7 @@ public class SentFragment extends Fragment {
 
 
     private ListView listView;
-    private Button btn_sendFile, btn_deleteFile;
+    private Button btn_openFile, btn_deleteFile;
 
     //
     private String directory, source;
@@ -53,15 +53,15 @@ public class SentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sent, container, false);
 
         listView = (ListView)view.findViewById(R.id.listView);
-        btn_sendFile = (Button)view.findViewById(R.id.btn_send);
+        btn_openFile = (Button)view.findViewById(R.id.btn_open);
         btn_deleteFile = (Button)view.findViewById(R.id.btn_delete);
 
 
         directory = getContext().getFilesDir().toString() + "/Sent Files";
-        fileManagerHelper = new FileManagerHelper(getContext(), listView, directory, btn_deleteFile);
+        fileManagerHelper = new FileManagerHelper(directory, view);
         fileManagerHelper.refreshFileList();
 
-        btn_sendFile.setOnClickListener(new View.OnClickListener() {
+        btn_openFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -114,46 +114,5 @@ public class SentFragment extends Fragment {
         });
 
         return view;
-    }
-
-
-
-    public File[] getFiles(String DirectoryPath) {
-        File f = new File(DirectoryPath);
-        f.mkdirs();
-        File[] file = f.listFiles();
-        return file;
-    }
-
-    public ArrayList<String> getFileNames(File[] file){
-        ArrayList<String> arrayFiles = new ArrayList<String>();
-        if (file.length == 0)
-            return null;
-        else {
-            for (int i=0; i<file.length; i++)
-                arrayFiles.add(file[i].getName());
-        }
-
-        return arrayFiles;
-    }
-
-    public void refreshFileList(){
-        File[] files = getFiles(getContext().getFilesDir().toString() + "/Sent Files");
-        final List<String> listFiles = getFileNames(files);
-
-        if (listFiles == null){
-            final List<String> noItem = Arrays.asList("No Log Files");
-            setAdapter(noItem);
-            btn_deleteFile.setEnabled(false);
-        }else {
-            setAdapter(listFiles);
-            btn_deleteFile.setEnabled(true);
-        }
-    }
-
-    private void setAdapter(List<String> list){
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.simle_list_item_multiple_choice, list);
-        listView.setAdapter(adapter);
-        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
     }
 }

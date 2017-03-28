@@ -1,11 +1,13 @@
 package com.phucphuong.noisesearch.Utilities;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.phucphuong.noisesearch.Fragments.UnsentFragment;
 import com.phucphuong.noisesearch.R;
 
 import java.io.File;
@@ -27,16 +29,19 @@ public class FileManagerHelper {
     Context context;
     ListView listView;
     String directory;
-    Button btn_deleteFile;
+    View view;
+    Button btn_send, btn_deleteFile, btn_openFile;
 
 
-    public FileManagerHelper(Context context, ListView listView, String directory, Button btn_delete){
-        this.context = context;
-        this.listView = listView;
+    public FileManagerHelper(String directory, View view){
+        this.context = view.getContext();
+        this.listView = (ListView)view.findViewById(R.id.listView);
         this.directory = directory;
-        this.btn_deleteFile = btn_delete;
+        this.view = view;
+        this.btn_deleteFile = (Button) view.findViewById(R.id.btn_delete);
+        this.btn_send = (Button) view.findViewById(R.id.btn_send);
+        this.btn_openFile = (Button)view.findViewById(R.id.btn_open);
     }
-
 
     public File[] getFiles(String DirectoryPath) {
         File f = new File(DirectoryPath);
@@ -65,9 +70,22 @@ public class FileManagerHelper {
             final List<String> noItem = Arrays.asList("No Log Files");
             setAdapter(noItem);
             btn_deleteFile.setEnabled(false);
+            if (btn_send != null){
+                btn_send.setEnabled(false);
+            }
+            if (btn_openFile != null){
+                btn_openFile.setEnabled(false);
+            }
+
         }else {
             setAdapter(listFiles);
             btn_deleteFile.setEnabled(true);
+            if (btn_send != null){
+                btn_send.setEnabled(true);
+            }
+            if (btn_openFile != null){
+                btn_openFile.setEnabled(true);
+            }
         }
     }
 

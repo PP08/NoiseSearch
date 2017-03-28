@@ -51,7 +51,7 @@ public class FileManager extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position == 1){
-                    ((SentFragment)adapter.getItem(position)).refreshFileList();
+                    ((SentFragment)adapter.getItem(position)).fileManagerHelper.refreshFileList();
                 }
             }
 
