@@ -37,7 +37,6 @@ public class UnsentFragment extends Fragment {
 
     //
     String prefix;
-    int amount_of_files = 0;
     boolean shouldContinue = true;
 
 
@@ -54,6 +53,9 @@ public class UnsentFragment extends Fragment {
         listView = (ListView)view.findViewById(R.id.listView);
         btn_sendFile = (Button)view.findViewById(R.id.btn_send);
         btn_deleteFile = (Button)view.findViewById(R.id.btn_delete);
+
+//        btn_deleteFile.setEnabled(false);
+//        btn_sendFile.setEnabled(false);
 
         directory = getContext().getFilesDir().toString() + "/Unsent Files";
 
@@ -80,8 +82,6 @@ public class UnsentFragment extends Fragment {
                 for (int i = 0; i < listView.getCount(); i++){
                     if (sparseBooleanArray.get(i)){
 
-                        amount_of_files++;
-
                         File src = new File(fileDirUnsent, listView.getItemAtPosition(i).toString());
                         File dst = new File(fileDirSent, listView.getItemAtPosition(i).toString());
                         String file_path = src.getAbsolutePath();
@@ -93,8 +93,6 @@ public class UnsentFragment extends Fragment {
                         }
                         arrayClasses.add(new UploadFile(src, dst, view, prefix));
                         arrayClasses.get(arrayClasses.size() - 1).uploadFileToserver();
-//                        uploadFile =
-//                        uploadFile.uploadFileToserver();
                     }
                 }
 
@@ -161,13 +159,13 @@ public class UnsentFragment extends Fragment {
         protected Boolean doInBackground(Void... params) {
             while(shouldContinue) {
                 if (isAllTaskFinished(arrayClasses)) {
-                    shouldContinue = false;
                     if (!arrayClasses.get(0).success){
                         return false;
                     }
+                    break;
                 }
             }
-            arrayClasses = new ArrayList<UploadFile>();
+            arrayClasses.clear();
             shouldContinue = true;
             return true;
         }

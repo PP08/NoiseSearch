@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 
 /**
@@ -53,6 +55,9 @@ public class MeterFragment extends Fragment {
 
     private String prefix;
     View meterView;
+    UploadFile uploadFile;
+    final ProgressDialog[] progressDialog = new ProgressDialog[1];
+    boolean shouldContinue = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,7 +165,7 @@ public class MeterFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
 
                 dialog.dismiss();
-                final ProgressDialog[] progressDialog = new ProgressDialog[1];
+
                 progressDialog[0] = new ProgressDialog(getContext());
                 progressDialog[0].setTitle("Uploading");
                 progressDialog[0].setMessage("Please wait...");
@@ -173,27 +178,13 @@ public class MeterFragment extends Fragment {
                 File src = new File(fileDirUnsent, soundMeter.FILENAME);
                 File dst = new File(fileDirSent, soundMeter.FILENAME);
 
-                UploadFile uploadFile = new UploadFile(src, dst, getView(), prefix);
+                uploadFile = new UploadFile(src, dst, getView(), prefix);
                 uploadFile.uploadFileToserver();
 
-                if (!uploadFile.finish){
-                    progressDialog[0].dismiss();
-                    if (!uploadFile.success){
-                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Cannot upload files");
-                        alert.setMessage("Cannot connect to the server at this moment, please try again in the next time");
-                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                        alert.show();
-                    }
-                }
+                AlertDialogAsyncTask alertDialogAsyncTask = new AlertDialogAsyncTask();
+                alertDialogAsyncTask.execute();
             }
         });
-
         alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
 
             @Override
@@ -203,5 +194,46 @@ public class MeterFragment extends Fragment {
         });
 
         alert.show();
+    }
+
+    public boolean isTaskFinished(){
+        if (uploadFile.finish){
+            return true;
+        }
+        return false;
+    }
+
+    public class AlertDialogAsyncTask extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            while(shouldContinue) {
+                if (isTaskFinished()) {
+                    if (!uploadFile.success){
+                        return false;
+                    }
+                    break;
+                }
+            }
+            shouldContinue = true;
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            progressDialog[0].dismiss();
+            if (!aBoolean){
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Cannot upload files");
+                alert.setMessage("Cannot connect to the server at this moment, please try again in the next time");
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
+            }
+        }
     }
 }

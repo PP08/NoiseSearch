@@ -7,4 +7,5 @@
     <color name="transAccent">#65294674</color>
     <color name="soft_green">#73DF4E</color>
     <color name="tabsTextColor">#c8e8ff</color>
+    <color name="buttonTextColor">#009688</color>
 </resources>

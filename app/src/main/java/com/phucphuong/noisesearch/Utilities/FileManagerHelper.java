@@ -1,11 +1,15 @@
 package com.phucphuong.noisesearch.Utilities;
 
 import android.content.Context;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.phucphuong.noisesearch.Fragments.UnsentFragment;
 import com.phucphuong.noisesearch.R;
@@ -69,30 +73,28 @@ public class FileManagerHelper {
         if (listFiles == null){
             final List<String> noItem = Arrays.asList("No Log Files");
             setAdapter(noItem);
-            btn_deleteFile.setEnabled(false);
-            if (btn_send != null){
-                btn_send.setEnabled(false);
-            }
-            if (btn_openFile != null){
-                btn_openFile.setEnabled(false);
-            }
 
         }else {
             setAdapter(listFiles);
-            btn_deleteFile.setEnabled(true);
-            if (btn_send != null){
-                btn_send.setEnabled(true);
-            }
-            if (btn_openFile != null){
-                btn_openFile.setEnabled(true);
-            }
         }
+        setStateOfButtons(false);
     }
 
     private void setAdapter(List<String> list){
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.simle_list_item_multiple_choice, list);
         listView.setAdapter(adapter);
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (hasClickedItem()){
+                    setStateOfButtons(true);
+                }else {
+                    setStateOfButtons(false);
+                }
+            }
+        });
     }
 
     public void copy(File src, File dst) throws IOException {
@@ -107,6 +109,31 @@ public class FileManagerHelper {
         }
         in.close();
         out.close();
+    }
+
+    public boolean hasClickedItem(){
+        SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
+        for (int i = 0; i < listView.getCount(); i++){
+            if (sparseBooleanArray.get(i)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void setStateOfButtons(boolean state){
+
+        if (btn_send != null){
+            btn_send.setEnabled(state);
+        }
+        if (btn_openFile != null){
+            btn_openFile.setEnabled(state);
+        }
+        if (btn_deleteFile != null){
+            btn_deleteFile.setEnabled(state);
+        }
+
     }
 
 }

@@ -48,6 +48,7 @@ public class UploadFile {
         this.directory = view.getContext().getFilesDir().toString() + "/Unsent Files";
         this.fileManagerHelper = new FileManagerHelper(directory, view);
         this.success = false;
+        this.finish = false;
     }
 
     public void uploadFileToserver(){
@@ -63,7 +64,7 @@ public class UploadFile {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://192.168.1.43/upload/")
+                .url("http://192.168.1.43/upload_"+ file_name + "/")
                 .post(request_body)
                 .build();
         UploadTask uploadTask = new UploadTask(client, request, file_path);
