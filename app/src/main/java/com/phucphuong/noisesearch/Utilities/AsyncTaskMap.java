@@ -63,8 +63,7 @@ public class AsyncTaskMap extends AsyncTask<Void, Void, double[]> {
         startMarker.setTitle("Your current location");
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-
+        map.getOverlays().add(startMarker);
+        map.invalidate();
     }
-
-
 }

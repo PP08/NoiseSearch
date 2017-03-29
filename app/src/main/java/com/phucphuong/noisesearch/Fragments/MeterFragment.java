@@ -15,9 +15,15 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ToggleButton;
+
+import com.phucphuong.noisesearch.Activities.MainActivity;
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.AsyncTaskGPS;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskMap;
 import com.phucphuong.noisesearch.Utilities.FileManagerHelper;
 import com.phucphuong.noisesearch.Utilities.GPSTracker;
@@ -49,6 +55,9 @@ public class MeterFragment extends Fragment {
 
     SoundMeter soundMeter;
     double spl = 0;
+
+    float start = -90;
+    float end = 0;
     public SettingsFragment settingsFragment;
     public GraphFragment graphFragment;
     public MapFragment mapFragment;
@@ -59,12 +68,25 @@ public class MeterFragment extends Fragment {
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
     boolean shouldContinue = true;
 
+
+    //
+    Animation animation;
+    ImageView clockwise;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         meterView = inflater.inflate(R.layout.fragment_meter, container, true);
         ToggleButton btn_start_stop = (ToggleButton)meterView.findViewById(R.id.btn_start_stop);
+
+        //clockwise
+        clockwise = (ImageView)meterView.findViewById(R.id.clockwise);
+
+        animation = createAnimation(90f, -90);
+        animation.setDuration(1500);
+        clockwise.startAnimation(animation);
+
 
         //fragment settings
         settingsFragment = (SettingsFragment) getFragmentManager().findFragmentById(R.id.settingsFragment);
@@ -81,6 +103,9 @@ public class MeterFragment extends Fragment {
         }else {
             prefix = "multiple";
         }
+
+        AsyncTaskGPS asyncTaskGPS = new AsyncTaskGPS(meterView.getRootView());
+        asyncTaskGPS.execute();
 
         btn_start_stop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -103,7 +128,11 @@ public class MeterFragment extends Fragment {
                     //myThread.interrupt();
                     soundMeter.thread.interrupt();
                     soundMeter.logThread.interrupt();
-                    settingsFragment.setValuesText("NOISE SEARCH");
+                    settingsFragment.setValuesText("NOISE SEARCH", "");
+                    start = -90;
+                    animation = createAnimation(end, start);
+                    animation.setDuration(1000);
+                    clockwise.startAnimation(animation);
                     //enable settings button
                     settingsFragment.setStateOfSettingsButtons(true);
 
@@ -126,10 +155,17 @@ public class MeterFragment extends Fragment {
 
             if(isRunning){
                 spl = msg.getData().getDouble("spl");
-                settingsFragment.setValuesText(Double.toString(spl));
+                settingsFragment.setValuesText(Double.toString(spl)," dB");
+
+                end = ((float) spl - 60) * 3/2;
+
+                animation = createAnimation(start,end);
+                animation.setDuration(500);
+                clockwise.startAnimation(animation);
+                start = end;
+
                 if (graphFragment != null){
                     graphFragment.addEntry(spl);
-
                 }
                 if (mapFragment != null){
                     mapFragment.drawOnFrament(location[0], location[1]);
@@ -235,5 +271,12 @@ public class MeterFragment extends Fragment {
                 alert.show();
             }
         }
+    }
+
+    public Animation createAnimation(float A, float B){
+        RotateAnimation rotateAnimation = new RotateAnimation(A, B, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 1f);
+        rotateAnimation.setDuration(500);
+        rotateAnimation.setFillAfter(true);
+        return  rotateAnimation;
     }
 }

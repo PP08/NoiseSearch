@@ -71,8 +71,9 @@ public class FileManagerHelper {
         final List<String> listFiles = getFileNames(files);
 
         if (listFiles == null){
-            final List<String> noItem = Arrays.asList("No Log Files");
-            setAdapter(noItem);
+//            final List<String> noItem = Arrays.asList("No Log Files");
+//            setAdapter(noItem);
+            listView.setVisibility(View.GONE);
 
         }else {
             setAdapter(listFiles);

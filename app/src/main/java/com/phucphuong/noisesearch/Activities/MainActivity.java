@@ -1,6 +1,7 @@
 package com.phucphuong.noisesearch.Activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.AsyncTaskGPS;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,14 +28,13 @@ public class MainActivity extends AppCompatActivity {
         btn_function1 = (ImageButton)findViewById(R.id.btn_function1);
         btn_function2 = (ImageButton)findViewById(R.id.btn_function2);
 
-
-
-
         btn_function1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent1 = new Intent(MainActivity.this, MeasureAtSinglePoint.class);
                 startActivity(intent1);
+
             }
         });
 
@@ -56,10 +57,12 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.INTERNET
                 }, 10);

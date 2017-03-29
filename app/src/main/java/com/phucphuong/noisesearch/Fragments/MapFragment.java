@@ -60,21 +60,20 @@ public class MapFragment extends Fragment {
 
         map = (MapView)view.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
-//
+
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-//        //params for thread
-        IMapController iMapController = map.getController();
-        Marker startMarker = new Marker(map);
+        //params for thread
+//        IMapController iMapController = map.getController();
+//        Marker startMarker = new Marker(map);
 //
 //        //        TODO: check this thread
 //
-
-        AsyncTaskMap asyncTaskMap = new AsyncTaskMap(getActivity(), iMapController, startMarker);
-        asyncTaskMap.execute();
-////
-        map.getOverlays().add(asyncTaskMap.startMarker);
-        map.invalidate();
+//        AsyncTaskMap asyncTaskMap = new AsyncTaskMap(getActivity(), iMapController, startMarker);
+//        asyncTaskMap.execute();
+//
+//        map.getOverlays().add(asyncTaskMap.startMarker);
+//        map.invalidate();
 
     }
 

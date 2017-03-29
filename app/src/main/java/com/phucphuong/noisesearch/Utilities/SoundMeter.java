@@ -22,7 +22,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Arrays;
@@ -168,8 +171,9 @@ public class SoundMeter {
 
         rsmValue = Math.sqrt(rsmValue);
         spl = 10 * Math.log10(rsmValue/BUFFSIZE) + 94;
-        spl = Math.round(spl);
+
         spl += (double)calibrationValue;
+        spl = Math.round(spl * 100.0) / 100.0;
         return  spl;
     }
 
@@ -231,4 +235,5 @@ public class SoundMeter {
         timeStamp = timeStampFormat.format(calendar.getTime());
         notify();
     }
+
 }

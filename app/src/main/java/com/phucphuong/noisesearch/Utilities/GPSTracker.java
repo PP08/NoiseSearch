@@ -68,12 +68,13 @@ public class GPSTracker extends Service implements LocationListener {
 
             if (!checkGPS){
                 Toast.makeText(context, "No Service Provider Available", Toast.LENGTH_LONG).show();
+                showSettingsAlert();
             }else {
                 this.canGetLocation = true;
 //                Toast.makeText(context, "GPS", Toast.LENGTH_SHORT).show();
 
                 try {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 3.5f, this);
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
                     Log.e("GPS Enabled", "GPS Enabled");
                     if (locationManager != null) {
                         lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -85,7 +86,6 @@ public class GPSTracker extends Service implements LocationListener {
                 } catch (SecurityException e) {
 
                 }
-
             }
         } catch (Exception e){
             e.printStackTrace();

@@ -40,7 +40,7 @@ public class SettingsFragment extends Fragment {
 //    TODO: implement the calibration using AsyncTask
 
     ImageButton btn_settings, btn_info;
-    TextView tv_values;
+    TextView tv_values, tv_decibel;
     View settingsView, settingWindow, infoWindow, calibrationWindow;
     AlertDialog parentDialog, calibrationDialog;
 
@@ -59,6 +59,7 @@ public class SettingsFragment extends Fragment {
         btn_settings = (ImageButton) settingsView.findViewById(R.id.btn_settings);
         btn_info = (ImageButton)settingsView.findViewById(R.id.btn_info);
         tv_values = (TextView)settingsView.findViewById(R.id.tv_values);
+        tv_decibel = (TextView)settingsView.findViewById(R.id.tv_decibel);
 
         btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,8 +166,9 @@ public class SettingsFragment extends Fragment {
     }
 
 
-    public void setValuesText(String text){
+    public void setValuesText(String text, String text2){
         tv_values.setText(text);
+        tv_decibel.setText(text2);
     }
     public void setStateOfSettingsButtons(boolean state){
         btn_settings.setEnabled(state);
