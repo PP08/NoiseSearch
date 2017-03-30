@@ -110,7 +110,6 @@ public class UploadFile {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            finish = true;
             if (aBoolean){
                 try {
                     fileManagerHelper.copy(src, dst);
@@ -124,10 +123,8 @@ public class UploadFile {
             }else {
                 success = false;
             }
+            finish = true;
+
         }
     }
 }
-
-
-
-//TODO: change url when upload 2 types log

@@ -127,14 +127,26 @@ public class FileManagerHelper {
 
         if (btn_send != null){
             btn_send.setEnabled(state);
+            setAlpha(btn_send, state);
         }
         if (btn_openFile != null){
             btn_openFile.setEnabled(state);
-        }
-        if (btn_deleteFile != null){
-            btn_deleteFile.setEnabled(state);
+            setAlpha(btn_openFile, state);
         }
 
+        if (btn_deleteFile != null){
+            btn_deleteFile.setEnabled(state);
+            setAlpha(btn_deleteFile, state);
+        }
+    }
+
+
+    private void setAlpha(Button btn, boolean state){
+        if (state){
+            btn.setAlpha(1f);
+        }else {
+            btn.setAlpha(0.5f);
+        }
     }
 
 }

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.phucphuong.noisesearch.Fragments.SettingsFragment;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskGPS;
 
@@ -101,5 +102,4 @@ public class MainActivity extends AppCompatActivity {
         btn_function1.setEnabled(false);
         btn_function2.setEnabled(false);
     }
-
 }

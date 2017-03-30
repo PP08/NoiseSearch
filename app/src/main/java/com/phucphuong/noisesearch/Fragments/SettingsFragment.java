@@ -1,6 +1,5 @@
 package com.phucphuong.noisesearch.Fragments;
 
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,11 +7,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +17,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
 import com.phucphuong.noisesearch.Activities.FileManager;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.CalibrationWindow;
-
-import java.io.File;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,9 +39,15 @@ public class SettingsFragment extends Fragment {
 
     float calirationValue;
     SharedPreferences sharedPref;
-    boolean speedMode;
+    boolean speedMode, isMeasuring;
 
     CalibrationWindow calibrationClass;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -71,6 +70,8 @@ public class SettingsFragment extends Fragment {
 
             }
         });
+
+        isMeasuring = false;
 
         btn_info.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +103,7 @@ public class SettingsFragment extends Fragment {
 
         //calibrate btn
         if (mview == settingWindow){
+
             Button btn_calibration = (Button)mview.findViewById(R.id.btn_calibration);
             btn_calibration.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -122,6 +124,14 @@ public class SettingsFragment extends Fragment {
             });
 
 
+            //TODO: disable calibration button while measuring
+            if (isMeasuring){
+                btn_calibration.setEnabled(false);
+                btn_calibration.setAlpha(0.5f);
+            }else {
+                btn_calibration.setEnabled(true);
+                btn_calibration.setAlpha(1f);
+            }
         }
     }
 
@@ -131,7 +141,6 @@ public class SettingsFragment extends Fragment {
         calibrationDialog = builder_cal.create();
         calibrationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         calibrationDialog.setCanceledOnTouchOutside(false);
-
 
         //initial calibration window
         readPref();
@@ -165,13 +174,13 @@ public class SettingsFragment extends Fragment {
 
     }
 
-
     public void setValuesText(String text, String text2){
         tv_values.setText(text);
         tv_decibel.setText(text2);
     }
     public void setStateOfSettingsButtons(boolean state){
-        btn_settings.setEnabled(state);
+//        btn_settings.setEnabled(state);
+        isMeasuring = state;
     }
 
     public void backButtonHandle(){

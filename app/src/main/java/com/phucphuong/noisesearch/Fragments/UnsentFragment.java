@@ -72,6 +72,7 @@ public class UnsentFragment extends Fragment {
                 progressDialog[0].setTitle("Uploading");
                 progressDialog[0].setMessage("Please wait...");
                 progressDialog[0].show();
+                progressDialog[0].setCanceledOnTouchOutside(false);
 
                 SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
                 File fileDirUnsent = new File(getContext().getFilesDir() + "/Unsent Files");
