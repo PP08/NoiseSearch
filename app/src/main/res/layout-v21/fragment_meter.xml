@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.phucphuong.noisesearch.Fragments.MeterFragment"
-    android:background="@drawable/round_corner_background">
+    android:background="@drawable/round_corner_background"
+    android:elevation="10dp"
+    android:translationZ="5dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="0dp"
