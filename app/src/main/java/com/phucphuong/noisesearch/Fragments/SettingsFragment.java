@@ -63,12 +63,6 @@ public class SettingsFragment extends Fragment {
         tv_values = (TextView)settingsView.findViewById(R.id.tv_values);
         tv_decibel = (TextView)settingsView.findViewById(R.id.tv_decibel);
 
-
-        custom_font = Typeface.createFromAsset(getActivity().getAssets(), "fonts/digital.ttf");
-        tv_values.setTypeface(custom_font);
-        tv_decibel.setTypeface(custom_font);
-
-
         btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,8 +128,6 @@ public class SettingsFragment extends Fragment {
                 }
             });
 
-            TextView tv_settings_title = (TextView)settingWindow.findViewById(R.id.tv_settings_title);
-            tv_settings_title.setTypeface(custom_font);
 
             //TODO: disable calibration button while measuring
             if (isMeasuring){

@@ -60,6 +60,8 @@ public class MeterFragment extends Fragment {
         meterView = inflater.inflate(R.layout.fragment_meter, container, true);
         ToggleButton btn_start_stop = (ToggleButton)meterView.findViewById(R.id.btn_start_stop);
 
+        btn_start_stop.setEnabled(false);
+        btn_start_stop.setAlpha(0.8f);
         //clockwise
         clockwise = (ImageView)meterView.findViewById(R.id.clockwise);
 
@@ -90,7 +92,8 @@ public class MeterFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked){
-
+                    AsyncTaskGPS asyncTaskGPS = new AsyncTaskGPS(meterView.getRootView());
+                    asyncTaskGPS.execute();
                     //disable calibration button
                     settingsFragment.setStateOfSettingsButtons(true);
 
@@ -124,7 +127,7 @@ public class MeterFragment extends Fragment {
                 spl = msg.getData().getDouble("spl");
                 settingsFragment.setValuesText(Double.toString(spl)," dB");
 
-                end = ((float) spl - 60) * 3/2;
+                end = ((float) spl - 67.5f) * 4/3;
 
                 animation = createAnimation(start,end);
                 animation.setDuration(500);

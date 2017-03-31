@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.phucphuong.noisesearch.R;
 
@@ -44,10 +45,12 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK){
-                    ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
-                    toggleButton.setEnabled(false);
-                    toggleButton.setAlpha(0.5f);
+//                    ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
+//                    toggleButton.setEnabled(false);
+//                    toggleButton.setAlpha(0.5f);
+//                    progressDialog.dismiss();
                     progressDialog.dismiss();
+                    Toast.makeText(view.getContext(), "You can start measure after your location have created", Toast.LENGTH_LONG).show();
                 }
                 return true;
             }
@@ -76,6 +79,8 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         progressDialog.dismiss();
-
+        ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
+        toggleButton.setEnabled(true);
+        toggleButton.setAlpha(1f);
     }
 }
