@@ -50,8 +50,7 @@ public class FileManagerHelper {
     public File[] getFiles(String DirectoryPath) {
         File f = new File(DirectoryPath);
         f.mkdirs();
-        File[] file = f.listFiles();
-        return file;
+        return f.listFiles();
     }
 
     public ArrayList<String> getFileNames(File[] file){
@@ -59,8 +58,7 @@ public class FileManagerHelper {
         if (file.length == 0)
             return null;
         else {
-            for (int i=0; i<file.length; i++)
-                arrayFiles.add(file[i].getName());
+            for (File aFile : file) arrayFiles.add(aFile.getName());
         }
 
         return arrayFiles;
@@ -69,13 +67,10 @@ public class FileManagerHelper {
     public void refreshFileList(){
         File[] files = getFiles(directory);
         final List<String> listFiles = getFileNames(files);
-
         if (listFiles == null){
-//            final List<String> noItem = Arrays.asList("No Log Files");
-//            setAdapter(noItem);
             listView.setVisibility(View.GONE);
-
         }else {
+            listView.setVisibility(View.VISIBLE);
             setAdapter(listFiles);
         }
         setStateOfButtons(false);
@@ -112,7 +107,7 @@ public class FileManagerHelper {
         out.close();
     }
 
-    public boolean hasClickedItem(){
+    private boolean hasClickedItem(){
         SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
         for (int i = 0; i < listView.getCount(); i++){
             if (sparseBooleanArray.get(i)){

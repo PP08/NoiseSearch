@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.phucphuong.noisesearch.Fragments.SettingsFragment;
 import com.phucphuong.noisesearch.R;
@@ -28,6 +30,14 @@ public class MainActivity extends AppCompatActivity {
 
         btn_function1 = (ImageButton)findViewById(R.id.btn_function1);
         btn_function2 = (ImageButton)findViewById(R.id.btn_function2);
+
+        Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/digital.ttf");
+
+        TextView tv_single = (TextView)findViewById(R.id.tv_single);
+        tv_single.setTypeface(custom_font);
+
+        TextView tv_multiple = (TextView)findViewById(R.id.tv_multiple);
+        tv_multiple.setTypeface(custom_font);
 
         btn_function1.setOnClickListener(new View.OnClickListener() {
             @Override

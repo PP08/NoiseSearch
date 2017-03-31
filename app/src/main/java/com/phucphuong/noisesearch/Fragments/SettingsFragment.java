@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -43,6 +44,8 @@ public class SettingsFragment extends Fragment {
 
     CalibrationWindow calibrationClass;
 
+    Typeface custom_font;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +62,12 @@ public class SettingsFragment extends Fragment {
         btn_info = (ImageButton)settingsView.findViewById(R.id.btn_info);
         tv_values = (TextView)settingsView.findViewById(R.id.tv_values);
         tv_decibel = (TextView)settingsView.findViewById(R.id.tv_decibel);
+
+
+        custom_font = Typeface.createFromAsset(getActivity().getAssets(), "fonts/digital.ttf");
+        tv_values.setTypeface(custom_font);
+        tv_decibel.setTypeface(custom_font);
+
 
         btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +114,7 @@ public class SettingsFragment extends Fragment {
         if (mview == settingWindow){
 
             Button btn_calibration = (Button)mview.findViewById(R.id.btn_calibration);
+            btn_calibration.setTypeface(custom_font);
             btn_calibration.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -115,6 +125,7 @@ public class SettingsFragment extends Fragment {
 
 
             Button btn_filemanager = (Button)mview.findViewById(R.id.btn_fileManager);
+            btn_filemanager.setTypeface(custom_font);
             btn_filemanager.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -123,6 +134,8 @@ public class SettingsFragment extends Fragment {
                 }
             });
 
+            TextView tv_settings_title = (TextView)settingWindow.findViewById(R.id.tv_settings_title);
+            tv_settings_title.setTypeface(custom_font);
 
             //TODO: disable calibration button while measuring
             if (isMeasuring){

@@ -231,6 +231,17 @@ public class MeterFragment extends Fragment {
                     }
                 });
                 alert.show();
+            }else {
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Files uploaded successful");
+                alert.setMessage("Your files have uploaded to our server. Thank you for your help!");
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
             }
         }
     }

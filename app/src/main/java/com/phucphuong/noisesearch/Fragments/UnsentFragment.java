@@ -154,28 +154,34 @@ public class UnsentFragment extends Fragment {
         return true;
     }
 
-    public class AlertDialogAsyncTask extends AsyncTask<Void, Void, Boolean>{
+    public class AlertDialogAsyncTask extends AsyncTask<Void, Void, Void>{
+
+
+        boolean success;
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            while(shouldContinue) {
-                if (isAllTaskFinished(arrayClasses)) {
-                    if (!arrayClasses.get(0).success){
-                        return false;
-                    }
-                    break;
-                }
-            }
-            arrayClasses.clear();
+        protected void onPreExecute() {
+            super.onPreExecute();
             shouldContinue = true;
-            return true;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected Void doInBackground(Void... params) {
+            while(shouldContinue) {
+                if (isAllTaskFinished(arrayClasses)) {
+                    success = arrayClasses.get(0).success;
+                    shouldContinue = false;
+                }
+            }
+            arrayClasses.clear();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
             progressDialog[0].dismiss();
-            if (!aBoolean){
+            if (!success){
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Cannot upload files");
                 alert.setMessage("Cannot connect to the server at this moment, please try again in the next time");
@@ -188,6 +194,16 @@ public class UnsentFragment extends Fragment {
                 alert.show();
             }else {
                 fileManagerHelper.refreshFileList();
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Files uploaded successful");
+                alert.setMessage("Your files have uploaded to our server. Thank you for your help!");
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
             }
         }
     }

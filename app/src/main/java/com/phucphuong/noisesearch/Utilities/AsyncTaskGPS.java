@@ -1,18 +1,17 @@
 package com.phucphuong.noisesearch.Utilities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ToggleButton;
-
-import com.phucphuong.noisesearch.Activities.MainActivity;
 import com.phucphuong.noisesearch.R;
+
 
 /**
  * Created by phucphuong on 3/29/17.
@@ -26,9 +25,11 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
     private GPSTracker gpsTracker;
     private boolean shouldContinue = true;
 
+
     public AsyncTaskGPS(View view){
         this.view = view;
         this.gpsTracker = new GPSTracker(view.getContext());
+
     }
 
     @Override
@@ -45,6 +46,7 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
                 if (keyCode == KeyEvent.KEYCODE_BACK){
                     ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
                     toggleButton.setEnabled(false);
+                    toggleButton.setAlpha(0.5f);
                     progressDialog.dismiss();
                 }
                 return true;
@@ -56,8 +58,12 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
+
         while (shouldContinue){
-            if (gpsTracker.lastLocation != null){
+            if (gpsTracker.lastLocation != null && (System.currentTimeMillis() - gpsTracker.lastLocation.getTime()) < 1000 * 60 * 5){
+                Log.e("time", Long.toString(gpsTracker.lastLocation.getTime()));
+                Log.e("system time", Long.toString(System.currentTimeMillis()));
+
                 shouldContinue = false;
             }else {
                 gpsTracker.lastLocation = gpsTracker.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);

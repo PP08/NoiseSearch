@@ -119,7 +119,6 @@ public class UploadFile {
                 File delFile = new File(path);
                 delFile.delete();
                 success = true;
-
             }else {
                 success = false;
             }
