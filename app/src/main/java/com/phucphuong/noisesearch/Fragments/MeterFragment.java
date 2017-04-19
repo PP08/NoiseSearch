@@ -94,6 +94,9 @@ public class MeterFragment extends Fragment {
                 if (isChecked){
                     AsyncTaskGPS asyncTaskGPS = new AsyncTaskGPS(meterView.getRootView());
                     asyncTaskGPS.execute();
+
+//                    TODO: merge this asyncTask thread to this thread.
+
                     //disable calibration button
                     settingsFragment.setStateOfSettingsButtons(true);
 
@@ -101,7 +104,7 @@ public class MeterFragment extends Fragment {
                         //start asyncTask here
                         mapFragment.startGPSTracker();
                     }
-                    settingsFragment.readPref();
+                    settingsFragment.readPrefCal();
                     soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
                     soundMeter.thread.start();
 

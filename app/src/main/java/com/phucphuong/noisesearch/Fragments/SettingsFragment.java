@@ -11,16 +11,22 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.phucphuong.noisesearch.Activities.FileManager;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.CalibrationWindow;
+import com.phucphuong.noisesearch.Utilities.Login;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,8 +41,8 @@ public class SettingsFragment extends Fragment {
 
     ImageButton btn_settings, btn_info;
     TextView tv_values, tv_decibel;
-    View settingsView, settingWindow, infoWindow, calibrationWindow;
-    AlertDialog parentDialog, calibrationDialog;
+    View settingsView, settingWindow, infoWindow, calibrationWindow, loginWindow;
+    AlertDialog parentDialog, calibrationDialog, loginDialog;
 
     float calirationValue;
     SharedPreferences sharedPref;
@@ -69,6 +75,7 @@ public class SettingsFragment extends Fragment {
 
                 settingWindow = inflater.inflate(R.layout.setting_window, container, true);
                 calibrationWindow = inflater.inflate(R.layout.fragment_calibration, container, true);
+                loginWindow = inflater.inflate(R.layout.login_window, container, true);
                 showAlertDialog(settingWindow);
 
             }
@@ -88,7 +95,7 @@ public class SettingsFragment extends Fragment {
         return settingsView;
     }
 
-    public void showAlertDialog(View mview){
+    public void showAlertDialog(final View mview){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(mview);
         parentDialog = builder.create();
@@ -108,28 +115,50 @@ public class SettingsFragment extends Fragment {
         if (mview == settingWindow){
 
             Button btn_calibration = (Button)mview.findViewById(R.id.btn_calibration);
-            btn_calibration.setTypeface(custom_font);
+//            btn_calibration.setTypeface(custom_font);
             btn_calibration.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    TODO : show the calibration fragment
+//                    TODO : show the calibration fragment(done)
                     showCalibrationWindow(calibrationWindow);
                 }
             });
 
 
             Button btn_filemanager = (Button)mview.findViewById(R.id.btn_fileManager);
-            btn_filemanager.setTypeface(custom_font);
+//            btn_filemanager.setTypeface(custom_font);
             btn_filemanager.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    TODO: show the filemanager fragment  here
+//                    TODO: show the filemanager fragment  here (done)
                     showFileManagerDialog();
                 }
             });
 
 
-            //TODO: disable calibration button while measuring
+            final Button btn_login = (Button)mview.findViewById(R.id.btn_login);
+            btn_login.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    TODO: show the login form(done)
+                    Log.e("button text", btn_login.getText().toString());
+                    if (btn_login.getText().toString().equals("LOG IN")){
+                        showLoginForm(loginWindow, mview);
+                    }else {
+                        Toast.makeText(mview.getContext(), "You have logout to the server!", Toast.LENGTH_SHORT).show();
+                        btn_login.setText("LOG IN");
+                    }
+                }
+            });
+
+
+//            TODO: set the states of switch compat and login button
+            //read pref file
+            //set the states
+
+
+
+            //TODO: disable calibration button while measuring(done)
             if (isMeasuring){
                 btn_calibration.setEnabled(false);
                 btn_calibration.setAlpha(0.5f);
@@ -148,7 +177,7 @@ public class SettingsFragment extends Fragment {
         calibrationDialog.setCanceledOnTouchOutside(false);
 
         //initial calibration window
-        readPref();
+        readPrefCal();
         calibrationClass = new CalibrationWindow(view, calirationValue, speedMode);
         calibrationClass.getViewElements();
 
@@ -175,8 +204,6 @@ public class SettingsFragment extends Fragment {
 
         //show dialog when everything's done
         calibrationDialog.show();
-
-
     }
 
     public void setValuesText(String text, String text2){
@@ -194,23 +221,25 @@ public class SettingsFragment extends Fragment {
         if (calibrationWindow.getParent() != null){
             ((ViewGroup) calibrationWindow.getParent()).removeView(calibrationWindow);
         }
-        writePref();
+        writePrefCal();
     }
 
     //for calibration
-    public void writePref(){
-        sharedPref = getActivity().getSharedPreferences("settings",Context.MODE_PRIVATE);
+    public void writePrefCal(){
+        sharedPref = getActivity().getSharedPreferences("calibration",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putFloat("calValue", calibrationClass.calibrationValue);
         editor.putBoolean("speedMode", calibrationClass.speedMode);
         editor.apply();
     }
 
-    public void readPref(){
-        sharedPref = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+    public void readPrefCal(){
+        sharedPref = getActivity().getSharedPreferences("calibration", Context.MODE_PRIVATE);
         this.calirationValue = sharedPref.getFloat("calValue", 0f);
         this.speedMode = sharedPref.getBoolean("speedMode", false);
     }
+
+
 
 
     //for filemanager
@@ -218,5 +247,75 @@ public class SettingsFragment extends Fragment {
     public void showFileManagerDialog(){
         Intent intent = new Intent(getContext(), FileManager.class);
         startActivity(intent);
+    }
+
+
+    //for login
+
+    private void showLoginForm(final View view, final View parentView){
+        AlertDialog.Builder builder_cal = new AlertDialog.Builder(getActivity());
+        builder_cal.setView(view);
+
+        loginDialog = builder_cal.create();
+        loginDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        loginDialog.setCanceledOnTouchOutside(false);
+
+
+        //get the views elements
+
+        final EditText ed_username = (EditText)view.findViewById(R.id.ed_username);
+        final EditText ed_password = (EditText)view.findViewById(R.id.ed_password);
+
+        ed_password.setText("");
+        Button btn_sign_in = (Button)view.findViewById(R.id.btn_sign_in);
+
+        //TODO: post login form to server
+
+        btn_sign_in.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Editable username, password;
+                username = ed_username.getText();
+                password = ed_password.getText();
+
+                final Login login = new Login(view, parentView, loginDialog, String.valueOf(username), String.valueOf(password));
+
+                login.loginToServer();
+            }
+        });
+
+        // handle system's back button
+        loginDialog.setOnKeyListener(new AlertDialog.OnKeyListener(){
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK){
+                    loginDialog.dismiss();
+                    ed_password.setText("");
+                    if (loginWindow.getParent() != null){
+                        ((ViewGroup) loginWindow.getParent()).removeView(loginWindow);
+                    }
+                }
+                return true;
+            }
+        });
+
+
+        //handle touching outside the dialog
+        loginDialog.setOnCancelListener(
+                new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                        ed_password.setText("");
+                        if (loginWindow.getParent() != null){
+                            ((ViewGroup) loginWindow.getParent()).removeView(loginWindow);
+                        }
+                        //When you touch outside of dialog bounds,
+                        //the dialog gets canceled and this method executes.
+                    }
+                }
+        );
+        loginDialog.show();
     }
 }

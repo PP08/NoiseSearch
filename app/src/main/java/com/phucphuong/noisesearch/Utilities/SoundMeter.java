@@ -67,7 +67,7 @@ public class SoundMeter {
     public String FILENAME = "";
     private String device_id = "";
     private String timeStamp;
-    private DateFormat timeStampFormat = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss.SSS");
+    private DateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); // "yyyy:MM:dd:HH:mm:ss.SSS"
 
     private String prefix;
     //for testing
@@ -214,7 +214,7 @@ public class SoundMeter {
         }
 
         String data;
-        data = device_id + "," + timeStamp + "," + Double.toString(splValue) + "," + Double.toString(longitude) + "," + Double.toString(latitude) +"\n";
+        data = device_id + "," + timeStamp + "," + Double.toString(splValue) + "," + Double.toString(latitude) + "," + Double.toString(longitude) +"\n";
         try{
             File fileDir = new File(context.getFilesDir() + "/Unsent Files");
             File file = new File(fileDir, FILENAME);

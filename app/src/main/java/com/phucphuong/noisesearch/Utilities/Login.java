@@ -1,0 +1,145 @@
+package com.phucphuong.noisesearch.Utilities;
+
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.phucphuong.noisesearch.Activities.MainActivity;
+import com.phucphuong.noisesearch.R;
+
+import org.w3c.dom.Text;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+/**
+ * Created by phucphuong on 4/20/17.
+ */
+
+public class Login {
+
+    String username, password;
+    View view, parentView;
+    OkHttpClient client;
+    Request request;
+    Response response;
+    AlertDialog alertDialog;
+
+    public Login(View view, View parentView, AlertDialog alertDialog, String username, String password){
+        this.view = view;
+        this.username = username;
+        this.password = password;
+        this.parentView = parentView;
+        this.alertDialog = alertDialog;
+
+    }
+
+    public void loginToServer(){
+
+        Log.e("username and password", String.valueOf(username) + ", " + String.valueOf(password));
+
+        client = new OkHttpClient();
+
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.1.43:80/api-token-auth/").newBuilder();
+        urlBuilder.addQueryParameter("username", username);
+        urlBuilder.addQueryParameter("password", password);
+
+        String url = urlBuilder.build().toString();
+
+        FormBody formBody = new FormBody.Builder()
+                .add("username", username)
+                .add("password", password)
+                .build();
+
+        request = new Request.Builder()
+                .url(url)
+                .post(formBody)
+                .build();
+
+        LoginAsyncTask loginAsyncTask = new LoginAsyncTask();
+        loginAsyncTask.execute();
+
+    }
+
+    private class LoginAsyncTask extends AsyncTask<Void, Void, String>{
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                response = client.newCall(request).execute();
+
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+                    if (responseData.contains("token")){
+//                        TODO: write token to sharedpreference file
+
+                        return "success";
+                    }
+                    else {
+                        return "notmatch";
+                    }
+                }else {
+                    return "badrequest";
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return "failed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            switch (result){
+                case "success":{
+                    Toast.makeText(view.getContext(), "login successfully!", Toast.LENGTH_SHORT).show();
+                    Button btn_login_logout = (Button)parentView.findViewById(R.id.btn_login);
+                    btn_login_logout.setText("Logout (login as " + username + ")");
+                    SwitchCompat sw_private = (SwitchCompat)parentView.findViewById(R.id.sw_private);
+                    sw_private.setEnabled(true);
+                    TextView tv_private = (TextView)parentView.findViewById(R.id.tv_private_mode);
+                    tv_private.setEnabled(true);
+
+                    InputMethodManager imm = (InputMethodManager)view.getContext().getSystemService(view.getContext().INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    ((Activity)view.getContext()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                    alertDialog.dismiss();
+                    if (view.getParent() != null){
+                        ((ViewGroup) view.getParent()).removeView(view);
+                    }
+                    break;
+                }
+                case "notmatch":{
+                    Toast.makeText(view.getContext(), "username or password doesn't match!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case "failed":{
+                    Toast.makeText(view.getContext(), "cannot connect to the server!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case "badrequest":{
+                    Toast.makeText(view.getContext(), "cannot login", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            }
+        }
+    }
+
+}
