@@ -71,6 +71,15 @@ public class UploadFile {
         uploadTask.execute();
     }
 
+
+    private void private_upload(){
+
+    }
+
+    private void public_upload(){
+
+    }
+
     private String getMineType(String path) {
 
         String extension = MimeTypeMap.getFileExtensionFromUrl(path);
@@ -127,3 +136,8 @@ public class UploadFile {
         }
     }
 }
+
+
+/**     TODO: - add private upload file to the server
+ *            - if user is not login or private mode is off, upload to the public database
+ */

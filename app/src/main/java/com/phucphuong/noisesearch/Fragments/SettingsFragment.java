@@ -11,13 +11,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -25,8 +29,11 @@ import android.widget.Toast;
 
 import com.phucphuong.noisesearch.Activities.FileManager;
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.AsyncTaskCalibration;
 import com.phucphuong.noisesearch.Utilities.CalibrationWindow;
 import com.phucphuong.noisesearch.Utilities.Login;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,12 +52,15 @@ public class SettingsFragment extends Fragment {
     AlertDialog parentDialog, calibrationDialog, loginDialog;
 
     float calirationValue;
-    SharedPreferences sharedPref;
+    SharedPreferences sharedPrefCal, sharedPrefSettings;
     boolean speedMode, isMeasuring;
 
+    boolean privateMode;
+    String auth_token, user_name;
     CalibrationWindow calibrationClass;
 
-    Typeface custom_font;
+    //switch private
+    boolean isTouched = false;
 
 
     @Override
@@ -135,16 +145,17 @@ public class SettingsFragment extends Fragment {
                 }
             });
 
+            final SwitchCompat sw_private = (SwitchCompat)mview.findViewById(R.id.sw_private);
 
             final Button btn_login = (Button)mview.findViewById(R.id.btn_login);
             btn_login.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    TODO: show the login form(done)
-                    Log.e("button text", btn_login.getText().toString());
                     if (btn_login.getText().toString().equals("LOG IN")){
                         showLoginForm(loginWindow, mview);
                     }else {
+                        delete_token();
+                        sw_private.setEnabled(false);
                         Toast.makeText(mview.getContext(), "You have logout to the server!", Toast.LENGTH_SHORT).show();
                         btn_login.setText("LOG IN");
                     }
@@ -152,11 +163,43 @@ public class SettingsFragment extends Fragment {
             });
 
 
+            sw_private.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    isTouched = true;
+                    return false;
+                }
+            });
+
+            sw_private.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+            {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+                {
+                    if (isTouched) {
+                        isTouched = false;
+                        if (isChecked) {
+                            privateMode = true;
+                            saveStateOfSwitch(privateMode);
+                        }
+                        else {
+                            privateMode = false;
+                            saveStateOfSwitch(privateMode);
+                        }
+                    }
+                }
+            });
+
 //            TODO: set the states of switch compat and login button
             //read pref file
             //set the states
+            readPrefSettings();
 
-
+            if (user_name.length() != 0){
+                btn_login.setText("Logout (login as " + user_name + ")");
+                sw_private.setEnabled(true);
+                sw_private.setChecked(privateMode);
+            }
 
             //TODO: disable calibration button while measuring(done)
             if (isMeasuring){
@@ -226,21 +269,43 @@ public class SettingsFragment extends Fragment {
 
     //for calibration
     public void writePrefCal(){
-        sharedPref = getActivity().getSharedPreferences("calibration",Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
+        sharedPrefCal = getActivity().getSharedPreferences("calibration",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefCal.edit();
         editor.putFloat("calValue", calibrationClass.calibrationValue);
         editor.putBoolean("speedMode", calibrationClass.speedMode);
         editor.apply();
     }
 
     public void readPrefCal(){
-        sharedPref = getActivity().getSharedPreferences("calibration", Context.MODE_PRIVATE);
-        this.calirationValue = sharedPref.getFloat("calValue", 0f);
-        this.speedMode = sharedPref.getBoolean("speedMode", false);
+        sharedPrefCal = getActivity().getSharedPreferences("calibration", Context.MODE_PRIVATE);
+        this.calirationValue = sharedPrefCal.getFloat("calValue", 0f);
+        this.speedMode = sharedPrefCal.getBoolean("speedMode", false);
     }
 
+    //setting windows statements
+    private void readPrefSettings(){
 
+        sharedPrefSettings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        user_name = sharedPrefSettings.getString("username", "");
 
+        auth_token = sharedPrefSettings.getString("token", "");
+        privateMode = sharedPrefSettings.getBoolean("private_mode", false);
+    }
+
+    private void delete_token(){
+        sharedPrefSettings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefSettings.edit();
+        editor.putString("username", "");
+        editor.putString("token", "");
+        editor.apply();
+    }
+
+    private void saveStateOfSwitch(boolean state){
+        sharedPrefSettings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefSettings.edit();
+        editor.putBoolean("private_mode", state);
+        editor.apply();
+    }
 
     //for filemanager
 
@@ -248,7 +313,6 @@ public class SettingsFragment extends Fragment {
         Intent intent = new Intent(getContext(), FileManager.class);
         startActivity(intent);
     }
-
 
     //for login
 
@@ -275,13 +339,13 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Editable username, password;
-                username = ed_username.getText();
-                password = ed_password.getText();
+                String username, password;
+                username = ed_username.getText().toString();
+                password = ed_password.getText().toString();
 
-                final Login login = new Login(view, parentView, loginDialog, String.valueOf(username), String.valueOf(password));
-
+                final Login login = new Login(view, parentView, loginDialog, username, password);
                 login.loginToServer();
+
             }
         });
 

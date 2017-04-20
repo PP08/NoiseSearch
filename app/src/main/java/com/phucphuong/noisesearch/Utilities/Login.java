@@ -1,10 +1,13 @@
 package com.phucphuong.noisesearch.Utilities;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,8 @@ import android.widget.Toast;
 import com.phucphuong.noisesearch.Activities.MainActivity;
 import com.phucphuong.noisesearch.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -88,7 +93,19 @@ public class Login {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
                     if (responseData.contains("token")){
+
+                        JSONObject jsonObject = new JSONObject(responseData);
+                        String token = jsonObject.getString("token");
+
+//                        String encrypted_token = Base64.encodeToString(token.getBytes(), Base64.DEFAULT);
+//                        String encrypted_username = Base64.encodeToString(username.getBytes(), Base64.DEFAULT);
+
 //                        TODO: write token to sharedpreference file
+                        SharedPreferences sharedPrefSettings = view.getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPrefSettings.edit();
+                        editor.putString("token", token);
+                        editor.putString("username", username);
+                        editor.apply();
 
                         return "success";
                     }
@@ -100,6 +117,8 @@ public class Login {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
             return "failed";
         }
@@ -110,6 +129,7 @@ public class Login {
             switch (result){
                 case "success":{
                     Toast.makeText(view.getContext(), "login successfully!", Toast.LENGTH_SHORT).show();
+
                     Button btn_login_logout = (Button)parentView.findViewById(R.id.btn_login);
                     btn_login_logout.setText("Logout (login as " + username + ")");
                     SwitchCompat sw_private = (SwitchCompat)parentView.findViewById(R.id.sw_private);

@@ -98,8 +98,6 @@ public class CalibrationWindow {
                 }
             }
         });
-
-
     }
 
     public void terminateThread(){
