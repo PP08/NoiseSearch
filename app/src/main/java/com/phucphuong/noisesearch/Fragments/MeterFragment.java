@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,12 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskGPS;
 import com.phucphuong.noisesearch.Utilities.SoundMeter;
 import com.phucphuong.noisesearch.Utilities.UploadFile;
+
 import java.io.File;
 
 /**
@@ -58,12 +61,12 @@ public class MeterFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         meterView = inflater.inflate(R.layout.fragment_meter, container, true);
-        ToggleButton btn_start_stop = (ToggleButton)meterView.findViewById(R.id.btn_start_stop);
+        ToggleButton btn_start_stop = (ToggleButton) meterView.findViewById(R.id.btn_start_stop);
 
         btn_start_stop.setEnabled(false);
         btn_start_stop.setAlpha(0.8f);
         //clockwise
-        clockwise = (ImageView)meterView.findViewById(R.id.clockwise);
+        clockwise = (ImageView) meterView.findViewById(R.id.clockwise);
 
         animation = createAnimation(90f, -90);
         animation.setDuration(1500);
@@ -78,10 +81,10 @@ public class MeterFragment extends Fragment {
         //fragment map
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
 
-        if (graphFragment != null){
+        if (graphFragment != null) {
             graphFragment.initializeLineChart();
             prefix = "single";
-        }else {
+        } else {
             prefix = "multiple";
         }
 
@@ -91,24 +94,27 @@ public class MeterFragment extends Fragment {
         btn_start_stop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    AsyncTaskGPS asyncTaskGPS = new AsyncTaskGPS(meterView.getRootView());
-                    asyncTaskGPS.execute();
+                if (isChecked) {
+//                    AsyncTaskGPS asyncTaskGPS = new AsyncTaskGPS(meterView.getRootView());
+//                    asyncTaskGPS.execute();
+//
+////                    TODO: merge this asyncTask thread to this thread.
+//
+//                    //disable calibration button
+//                    settingsFragment.setStateOfSettingsButtons(true);
+//
+//                    if (mapFragment != null) {
+//                        //start asyncTask here
+//                        mapFragment.startGPSTracker();
+//                    }
+//                    settingsFragment.readPrefCal();
+//                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
+//                    soundMeter.thread.start();
 
-//                    TODO: merge this asyncTask thread to this thread.
+                    CheckGPSBeforeStart checkGPSBeforeStart = new CheckGPSBeforeStart(getView());
+                    checkGPSBeforeStart.execute();
 
-                    //disable calibration button
-                    settingsFragment.setStateOfSettingsButtons(true);
-
-                    if (mapFragment != null){
-                        //start asyncTask here
-                        mapFragment.startGPSTracker();
-                    }
-                    settingsFragment.readPrefCal();
-                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
-                    soundMeter.thread.start();
-
-                }else {
+                } else {
                     handleDestroyView();
                     sentFileToServer();
                 }
@@ -118,42 +124,42 @@ public class MeterFragment extends Fragment {
         return meterView;
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             handler.obtainMessage();
             boolean isRunning = msg.getData().getBoolean("isRunning");
-            double [] location = msg.getData().getDoubleArray("location");
+            double[] location = msg.getData().getDoubleArray("location");
 
-            if(isRunning){
+            if (isRunning) {
                 spl = msg.getData().getDouble("spl");
-                settingsFragment.setValuesText(Double.toString(spl)," dB");
+                settingsFragment.setValuesText(Double.toString(spl), " dB");
 
-                end = ((float) spl - 67.5f) * 4/3;
+                end = ((float) spl - 67.5f) * 4 / 3;
 
-                animation = createAnimation(start,end);
+                animation = createAnimation(start, end);
                 animation.setDuration(500);
                 clockwise.startAnimation(animation);
                 start = end;
 
-                if (graphFragment != null){
+                if (graphFragment != null) {
                     graphFragment.addEntry(spl);
                 }
-                if (mapFragment != null){
+                if (mapFragment != null) {
                     assert location != null;
                     mapFragment.drawOnFrament(location[0], location[1]);
                 }
 
-            }else{
-                if (mapFragment != null){
+            } else {
+                if (mapFragment != null) {
                     mapFragment.setEndMarker();
                 }
             }
         }
     };
 
-    private void sentFileToServer(){
+    private void sentFileToServer() {
 
         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
         alert.setTitle("Send File To Server");
@@ -195,8 +201,8 @@ public class MeterFragment extends Fragment {
         alert.show();
     }
 
-    public boolean isTaskFinished(){
-        if (uploadFile.finish){
+    public boolean isTaskFinished() {
+        if (uploadFile.finish) {
             return true;
         }
         return false;
@@ -205,6 +211,7 @@ public class MeterFragment extends Fragment {
     public class AlertDialogAsyncTask extends AsyncTask<Void, Void, Void> {
 
         boolean success;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -213,9 +220,9 @@ public class MeterFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            while(shouldContinue) {
+            while (shouldContinue) {
                 if (isTaskFinished()) {
-                    success =  uploadFile.success;
+                    success = uploadFile.success;
                     shouldContinue = false;
                 }
             }
@@ -226,7 +233,7 @@ public class MeterFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             progressDialog[0].dismiss();
-            if (!success){
+            if (!success) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Cannot upload files");
                 alert.setMessage("Cannot connect to the server at this moment, please try again in the next time");
@@ -237,7 +244,7 @@ public class MeterFragment extends Fragment {
                     }
                 });
                 alert.show();
-            }else {
+            } else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Files uploaded successful");
                 alert.setMessage("Your files have uploaded to our server. Thank you for your help!");
@@ -252,14 +259,14 @@ public class MeterFragment extends Fragment {
         }
     }
 
-    public Animation createAnimation(float A, float B){
+    public Animation createAnimation(float A, float B) {
         RotateAnimation rotateAnimation = new RotateAnimation(A, B, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 1f);
         rotateAnimation.setDuration(500);
         rotateAnimation.setFillAfter(true);
-        return  rotateAnimation;
+        return rotateAnimation;
     }
 
-    public void handleDestroyView(){
+    public void handleDestroyView() {
         soundMeter.terminate();
         soundMeter.logThread.interrupt();
         soundMeter.thread.interrupt();
@@ -271,9 +278,9 @@ public class MeterFragment extends Fragment {
         settingsFragment.setStateOfSettingsButtons(false);
     }
 
-    public void handleBackPress(){
-        if (soundMeter != null){
-            if (soundMeter.thread.isAlive()){
+    public void handleBackPress() {
+        if (soundMeter != null) {
+            if (soundMeter.thread.isAlive()) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Stop Measuring");
                 alert.setMessage("Do you want to stop the measuring?");
@@ -283,7 +290,7 @@ public class MeterFragment extends Fragment {
                         handleDestroyView();
                         dialog.dismiss();
 
-                        Toast.makeText(getContext(),"Your log have saved.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Your log have saved.", Toast.LENGTH_SHORT).show();
 
                         getActivity().finish();
                     }
@@ -295,14 +302,38 @@ public class MeterFragment extends Fragment {
                     }
                 });
                 alert.show();
-            }else {
+            } else {
                 getActivity().finish();
             }
-        }else {
+        } else {
             getActivity().finish();
         }
     }
 
+    private class CheckGPSBeforeStart extends AsyncTaskGPS {
 
+
+        public CheckGPSBeforeStart(View view) {
+            super(view);
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+//            Log.e("thong bao", "xong roi ne");
+//            disable calibration button
+            settingsFragment.setStateOfSettingsButtons(true);
+
+            if (mapFragment != null) {
+                //start asyncTask here
+                mapFragment.startGPSTracker();
+            }
+            settingsFragment.readPrefCal();
+            soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
+            soundMeter.thread.start();
+        }
+    }
 }
 

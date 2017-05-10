@@ -45,12 +45,12 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK){
-//                    ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
-//                    toggleButton.setEnabled(false);
-//                    toggleButton.setAlpha(0.5f);
-//                    progressDialog.dismiss();
+                    ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
+                    toggleButton.setEnabled(false);
+                    toggleButton.setAlpha(0.5f);
                     progressDialog.dismiss();
-                    Toast.makeText(view.getContext(), "You can start measure after your location have created", Toast.LENGTH_LONG).show();
+//                    progressDialog.dismiss();
+                    Toast.makeText(view.getContext(), "You can start measure after your location has created", Toast.LENGTH_LONG).show();
                 }
                 return true;
             }
@@ -63,9 +63,9 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
 
 
         while (shouldContinue){
-            if (gpsTracker.lastLocation != null && (System.currentTimeMillis() - gpsTracker.lastLocation.getTime()) < 1000 * 60 * 5){
-                Log.e("time", Long.toString(gpsTracker.lastLocation.getTime()));
-                Log.e("system time", Long.toString(System.currentTimeMillis()));
+            if (gpsTracker.lastLocation != null && (System.currentTimeMillis() - gpsTracker.lastLocation.getTime()) < 1000 * 60 * 1){
+//                Log.e("time", Long.toString(gpsTracker.lastLocation.getTime()));
+//                Log.e("system time", Long.toString(System.currentTimeMillis()));
 
                 shouldContinue = false;
             }else {
@@ -78,7 +78,9 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        progressDialog.dismiss();
+        if (progressDialog.isShowing()){
+            progressDialog.dismiss();
+        }
         ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
         toggleButton.setEnabled(true);
         toggleButton.setAlpha(1f);

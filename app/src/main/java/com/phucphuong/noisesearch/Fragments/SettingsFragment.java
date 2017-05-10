@@ -151,13 +151,13 @@ public class SettingsFragment extends Fragment {
             btn_login.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (btn_login.getText().toString().equals("LOG IN")){
+                    if (btn_login.getText().toString().equals("Log in")){
                         showLoginForm(loginWindow, mview);
                     }else {
                         delete_token();
                         sw_private.setEnabled(false);
                         Toast.makeText(mview.getContext(), "You have logout to the server!", Toast.LENGTH_SHORT).show();
-                        btn_login.setText("LOG IN");
+                        btn_login.setText("Log in");
                     }
                 }
             });
@@ -297,6 +297,7 @@ public class SettingsFragment extends Fragment {
         SharedPreferences.Editor editor = sharedPrefSettings.edit();
         editor.putString("username", "");
         editor.putString("token", "");
+        editor.putBoolean("private_mode", false);
         editor.apply();
     }
 

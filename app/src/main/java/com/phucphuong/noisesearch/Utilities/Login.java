@@ -62,7 +62,7 @@ public class Login {
 
         client = new OkHttpClient();
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.1.43:80/api-token-auth/").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://172.20.10.13:80/api/token-auth/").newBuilder(); // 192.168.1.43
         urlBuilder.addQueryParameter("username", username);
         urlBuilder.addQueryParameter("password", password);
 

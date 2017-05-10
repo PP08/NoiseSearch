@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.phucphuong.noisesearch.R;
 import java.io.File;
 import java.io.IOException;
 
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -54,30 +56,41 @@ public class UploadFile {
     public void uploadFileToserver(){
         String content_type = getMineType(src.getPath());
         String file_path = src.getAbsolutePath();
-        OkHttpClient client = new OkHttpClient();
-        RequestBody file_body = RequestBody.create(MediaType.parse(content_type), src);
 
-        RequestBody request_body = new MultipartBody.Builder()
+        SharedPreferences sharedPrefSettings = view.getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        String token = sharedPrefSettings.getString("token", "");
+        if (token.length() != 0){
+            token = "token " + token;
+        }
+        boolean private_mode = sharedPrefSettings.getBoolean("private_mode", false);
+
+        RequestBody file_body = RequestBody.create(MediaType.parse(content_type), src);
+        RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("type", content_type)
-                .addFormDataPart(file_name,file_path.substring(file_path.lastIndexOf("/")+1), file_body)
+                .addFormDataPart("file", file_path.substring(file_path.lastIndexOf("/")+1), file_body)
                 .build();
 
+        String url;
+
+        if (private_mode){
+            url = "http://172.20.10.13:80/api/private_" + file_name + "/"; //192.168.1.43:80/
+        }
+        else {
+            url = "http://172.20.10.13:80/api/public_" + file_name + "/"; //192.168.1.43:80/
+        }
+
+        upload_task(url, requestBody, token, file_path);
+    }
+
+    private void upload_task(String url, RequestBody requestBody, String token, String file_path){
+        OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("http://192.168.1.43/upload_"+ file_name + "/")
-                .post(request_body)
+                .header("Authorization", token)
+                .url(url)
+                .post(requestBody)
                 .build();
         UploadTask uploadTask = new UploadTask(client, request, file_path);
         uploadTask.execute();
-    }
-
-
-    private void private_upload(){
-
-    }
-
-    private void public_upload(){
-
     }
 
     private String getMineType(String path) {
@@ -86,7 +99,7 @@ public class UploadFile {
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
     }
 
-    private class UploadTask extends AsyncTask<Void, Void, Boolean> {
+    private class UploadTask extends AsyncTask<Void, Void, Void> {
         OkHttpClient client;
         Request request;
         Response response;
@@ -96,7 +109,6 @@ public class UploadFile {
             this.client = client;
             this.request = request;
             this.path = path;
-
         }
 
         @Override
@@ -106,20 +118,28 @@ public class UploadFile {
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {
             try {
                 response = client.newCall(request).execute();
+                if (response.isSuccessful()){
+                    if (response.body().string().contains("uploaded_at")){
+                        success = true;
+                    }
+                    else {
+                        success = false;
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
+                success = false;
             }
-            return true;
+            return  null;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            if (aBoolean){
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (success){
                 try {
                     fileManagerHelper.copy(src, dst);
                 } catch (IOException e) {
@@ -127,12 +147,8 @@ public class UploadFile {
                 }
                 File delFile = new File(path);
                 delFile.delete();
-                success = true;
-            }else {
-                success = false;
             }
             finish = true;
-
         }
     }
 }
@@ -140,4 +156,5 @@ public class UploadFile {
 
 /**     TODO: - add private upload file to the server
  *            - if user is not login or private mode is off, upload to the public database
+ *            - rewrite asyncTask when upload (handle response statuses like BADREQUEST, etc..)
  */

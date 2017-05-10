@@ -67,7 +67,7 @@ public class SoundMeter {
     public String FILENAME = "";
     private String device_id = "";
     private String timeStamp;
-    private DateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); // "yyyy:MM:dd:HH:mm:ss.SSS"
+    private DateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // "yyyy:MM:dd:HH:mm:ss.SSS"
 
     private String prefix;
     //for testing
