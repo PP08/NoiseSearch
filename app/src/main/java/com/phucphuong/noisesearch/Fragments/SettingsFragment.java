@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -61,6 +62,8 @@ public class SettingsFragment extends Fragment {
 
     //switch private
     boolean isTouched = false;
+
+    TextView sign_up_tv;
 
 
     @Override
@@ -123,6 +126,18 @@ public class SettingsFragment extends Fragment {
 
         //calibrate btn
         if (mview == settingWindow){
+
+            sign_up_tv = (TextView)mview.findViewById(R.id.sign_up_tv);
+            sign_up_tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String url = "https://noisesearch.herokuapp.com/signup/";
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+            });
+
 
             Button btn_calibration = (Button)mview.findViewById(R.id.btn_calibration);
 //            btn_calibration.setTypeface(custom_font);
