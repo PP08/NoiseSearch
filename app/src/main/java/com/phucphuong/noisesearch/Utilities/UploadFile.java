@@ -73,10 +73,10 @@ public class UploadFile {
         String url;
 
         if (private_mode){
-            url = "http://172.20.10.13:80/api/private_" + file_name + "/"; //192.168.1.43:80/
+            url = "https://noisesearch.herokuapp.com/api/private_" + file_name + "/"; //192.168.1.43:80/
         }
         else {
-            url = "http://172.20.10.13:80/api/public_" + file_name + "/"; //192.168.1.43:80/
+            url = "https://noisesearch.herokuapp.com/api/public_" + file_name + "/"; //192.168.1.43:80/
         }
 
         upload_task(url, requestBody, token, file_path);
