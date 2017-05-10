@@ -4,10 +4,12 @@ package com.phucphuong.noisesearch.Fragments;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -34,19 +36,21 @@ public class GraphFragment extends Fragment {
     LineChart lineChart;
     Typeface mTfLight = Typeface.DEFAULT;
     View graphView;
+    Chronometer chronometer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-         graphView = inflater.inflate(R.layout.fragment_graph, container, true);
+        graphView = inflater.inflate(R.layout.fragment_graph, container, true);
+        chronometer = (Chronometer)graphView.findViewById(R.id.chronometer);
 
         return graphView;
     }
 
 
-    public void initializeLineChart(){
+    public void initializeLineChart() {
 
         //graph
         lineChart = (LineChart) graphView.findViewById(R.id.line_chart);
@@ -107,17 +111,16 @@ public class GraphFragment extends Fragment {
         rightAxis.setAxisMinimum(0f);
 
 
-
     }
 
 
-    public void addEntry(double val){
+    public void addEntry(double val) {
         LineData data = lineChart.getData();
 
-        if (data != null){
+        if (data != null) {
             ILineDataSet set = data.getDataSetByIndex(0);
             //set.addEntry(...) //can be called as well
-            if (set == null){
+            if (set == null) {
                 set = createSet();
                 data.addDataSet(set);
             }
@@ -138,7 +141,7 @@ public class GraphFragment extends Fragment {
 
     }
 
-    private LineDataSet createSet(){
+    private LineDataSet createSet() {
 
         LineDataSet set = new LineDataSet(null, "SPL");
         //set.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -158,5 +161,23 @@ public class GraphFragment extends Fragment {
     }
 
 
+    public void startChronometer(){
+
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener(){
+            @Override
+            public void onChronometerTick(Chronometer cArg) {
+                long time = SystemClock.elapsedRealtime() - cArg.getBase();
+                int h   = (int)(time /3600000);
+                int m = (int)(time - h*3600000)/60000;
+                int s= (int)(time - h*3600000- m*60000)/1000 ;
+                String hh = h < 10 ? "0"+h: h+"";
+                String mm = m < 10 ? "0"+m: m+"";
+                String ss = s < 10 ? "0"+s: s+"";
+                cArg.setText(hh+":"+mm+":"+ss);
+            }
+        });
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
+    }
 
 }
