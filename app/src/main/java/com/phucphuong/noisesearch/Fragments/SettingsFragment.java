@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.phucphuong.noisesearch.Activities.AppInfo;
 import com.phucphuong.noisesearch.Activities.FileManager;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskCalibration;
@@ -99,9 +100,10 @@ public class SettingsFragment extends Fragment {
         btn_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                infoWindow = inflater.inflate(R.layout.info_window, container, true);
-                showAlertDialog(infoWindow);
-
+//                infoWindow = inflater.inflate(R.layout.info_window, container, true);
+//                showAlertDialog(infoWindow);
+                Intent intent = new Intent(getContext(), AppInfo.class);
+                startActivity(intent);
             }
         });
 
