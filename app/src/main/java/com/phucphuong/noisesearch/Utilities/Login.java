@@ -1,6 +1,7 @@
 package com.phucphuong.noisesearch.Utilities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -46,8 +47,9 @@ public class Login {
     Request request;
     Response response;
     AlertDialog alertDialog;
+    ProgressDialog progressDialog;
 
-    public Login(View view, View parentView, AlertDialog alertDialog, String username, String password){
+    public Login(View view, View parentView, AlertDialog alertDialog, String username, String password) {
         this.view = view;
         this.username = username;
         this.password = password;
@@ -56,13 +58,14 @@ public class Login {
 
     }
 
-    public void loginToServer(){
+    public void loginToServer() {
 
         Log.e("username and password", String.valueOf(username) + ", " + String.valueOf(password));
 
         client = new OkHttpClient();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://noisesearch.herokuapp.com/api/token-auth/").newBuilder(); // 192.168.1.43
+//        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.1.43/api/token-auth/").newBuilder(); // 192.168.1.43
         urlBuilder.addQueryParameter("username", username);
         urlBuilder.addQueryParameter("password", password);
 
@@ -83,16 +86,29 @@ public class Login {
 
     }
 
-    private class LoginAsyncTask extends AsyncTask<Void, Void, String>{
+    private class LoginAsyncTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (username.length() > 0 && password.length() > 0) {
+                progressDialog = new ProgressDialog(view.getContext());
+                progressDialog.setTitle("Login");
+                progressDialog.setMessage("Please wait...");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+            }
+        }
 
         @Override
         protected String doInBackground(Void... params) {
             try {
                 response = client.newCall(request).execute();
 
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    if (responseData.contains("token")){
+                    if (responseData.contains("token")) {
 
                         JSONObject jsonObject = new JSONObject(responseData);
                         String token = jsonObject.getString("token");
@@ -108,11 +124,10 @@ public class Login {
                         editor.apply();
 
                         return "success";
-                    }
-                    else {
+                    } else {
                         return "notmatch";
                     }
-                }else {
+                } else {
                     return "badrequest";
                 }
             } catch (IOException e) {
@@ -126,42 +141,48 @@ public class Login {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            switch (result){
-                case "success":{
+
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+            switch (result) {
+                case "success": {
                     Toast.makeText(view.getContext(), "login successfully!", Toast.LENGTH_SHORT).show();
 
-                    Button btn_login_logout = (Button)parentView.findViewById(R.id.btn_login);
+                    Button btn_login_logout = (Button) parentView.findViewById(R.id.btn_login);
                     btn_login_logout.setText("Logout (login as " + username + ")");
-                    SwitchCompat sw_private = (SwitchCompat)parentView.findViewById(R.id.sw_private);
+                    SwitchCompat sw_private = (SwitchCompat) parentView.findViewById(R.id.sw_private);
                     sw_private.setEnabled(true);
-                    TextView tv_private = (TextView)parentView.findViewById(R.id.tv_private_mode);
+                    TextView tv_private = (TextView) parentView.findViewById(R.id.tv_private_mode);
                     tv_private.setEnabled(true);
 
-                    InputMethodManager imm = (InputMethodManager)view.getContext().getSystemService(view.getContext().INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(view.getContext().INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    ((Activity)view.getContext()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                    ((Activity) view.getContext()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                     alertDialog.dismiss();
-                    if (view.getParent() != null){
+                    if (view.getParent() != null) {
                         ((ViewGroup) view.getParent()).removeView(view);
                     }
                     break;
                 }
-                case "notmatch":{
+                case "notmatch": {
                     Toast.makeText(view.getContext(), "username or password doesn't match!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case "failed":{
+                case "failed": {
                     Toast.makeText(view.getContext(), "cannot connect to the server!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case "badrequest":{
+                case "badrequest": {
                     Toast.makeText(view.getContext(), "cannot login", Toast.LENGTH_SHORT).show();
                     break;
                 }
             }
         }
     }
-
 }
 
 //TODO: create a progress dialog when waiting login to the server

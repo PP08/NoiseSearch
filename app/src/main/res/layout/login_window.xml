@@ -95,6 +95,6 @@
         app:layout_constraintVertical_bias="0.064"
         app:layout_constraintDimensionRatio="h,7:1"
         app:layout_constraintHorizontal_bias="0.0"
-        android:id="@+id/btn_sign_in"/>
+        android:id="@+id/btn_sign_in" />
 
 </android.support.constraint.ConstraintLayout>

@@ -74,9 +74,11 @@ public class UploadFile {
 
         if (private_mode){
             url = "https://noisesearch.herokuapp.com/api/private_" + file_name + "/"; //192.168.1.43:80/
+//            url = "http://192.168.1.43/api/private_" + file_name + "/"; //192.168.1.43:80/
         }
         else {
             url = "https://noisesearch.herokuapp.com/api/public_" + file_name + "/"; //192.168.1.43:80/
+//            url = "http://192.168.1.43/api/public_" + file_name + "/"; //192.168.1.43:80/
         }
 
         upload_task(url, requestBody, token, file_path);
@@ -121,7 +123,13 @@ public class UploadFile {
         protected Void doInBackground(Void... params) {
             try {
                 response = client.newCall(request).execute();
+
+                Log.e("sanity check", Boolean.toString(response.isSuccessful()));
+
                 if (response.isSuccessful()){
+
+                    Log.e("response", response.body().toString());
+
                     if (response.body().string().contains("uploaded_at")){
                         success = true;
                     }
