@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.phucphuong.noisesearch.Fragments.GraphFragment"
+    android:background="@color/colorAccent"
     android:elevation="10dp"
-    android:translationZ="5dp"
-    android:background="@drawable/round_corner_background">
+    android:translationZ="5dp">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -38,6 +38,7 @@
             app:layout_constraintRight_toRightOf="@+id/constraintLayout3"
             app:layout_constraintBottom_toBottomOf="@+id/constraintLayout3"
             android:layout_marginBottom="8dp" />
+
         <com.github.mikephil.charting.charts.LineChart
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -51,11 +52,9 @@
             android:layout_marginTop="0dp"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.0"
-            app:layout_constraintBottom_toTopOf="@+id/tv_timer">
+            app:layout_constraintBottom_toTopOf="@+id/chronometer">
 
         </com.github.mikephil.charting.charts.LineChart>
+
     </android.support.constraint.ConstraintLayout>
-
-
-
 </android.support.constraint.ConstraintLayout>
