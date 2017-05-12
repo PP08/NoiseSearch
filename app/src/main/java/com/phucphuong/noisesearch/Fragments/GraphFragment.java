@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.ReplaceFont;
 
 
 /**
@@ -45,7 +46,6 @@ public class GraphFragment extends Fragment {
 
         graphView = inflater.inflate(R.layout.fragment_graph, container, true);
         chronometer = (Chronometer)graphView.findViewById(R.id.chronometer);
-
         return graphView;
     }
 

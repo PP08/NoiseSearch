@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.phucphuong.noisesearch.Fragments.SettingsFragment;
 import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskGPS;
+import com.phucphuong.noisesearch.Utilities.ReplaceFont;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +27,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ReplaceFont.replaceDefaultFont(this, "DEFAULT", "fonts/Roboto-Light.ttf");
+        ReplaceFont.replaceDefaultFont(this, "MONOSPACE", "fonts/Roboto-Light.ttf");
+        ReplaceFont.replaceDefaultFont(this, "SERIF", "fonts/Roboto-Light.ttf");
+        ReplaceFont.replaceDefaultFont(this, "SANS_SERIF", "fonts/Roboto-Light.ttf");
+
         setContentView(R.layout.activity_main);
 
         btn_function1 = (ImageButton)findViewById(R.id.btn_function1);

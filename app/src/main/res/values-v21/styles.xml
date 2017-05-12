@@ -3,9 +3,10 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:typeface">serif</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/darkAccent</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">#36D0B3</item>
         <item name="colorControlNormal">@color/tabsTextColor</item>
         <item name="android:navigationBarColor">@color/darkAccent</item>
     </style>

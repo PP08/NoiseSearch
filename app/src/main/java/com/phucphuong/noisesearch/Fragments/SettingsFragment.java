@@ -34,6 +34,7 @@ import com.phucphuong.noisesearch.R;
 import com.phucphuong.noisesearch.Utilities.AsyncTaskCalibration;
 import com.phucphuong.noisesearch.Utilities.CalibrationWindow;
 import com.phucphuong.noisesearch.Utilities.Login;
+import com.phucphuong.noisesearch.Utilities.ReplaceFont;
 
 import java.io.UnsupportedEncodingException;
 

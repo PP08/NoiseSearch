@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.phucphuong.noisesearch.Fragments.MeterFragment;
 import com.phucphuong.noisesearch.R;
+import com.phucphuong.noisesearch.Utilities.ReplaceFont;
 import com.phucphuong.noisesearch.Utilities.UploadFile;
 
 import java.io.File;
@@ -27,7 +28,6 @@ public class MeasureAtSinglePoint extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measure_at_single_point);
-
     }
 
     @Override
