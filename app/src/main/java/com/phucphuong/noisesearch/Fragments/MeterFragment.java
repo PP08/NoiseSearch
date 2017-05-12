@@ -117,7 +117,9 @@ public class MeterFragment extends Fragment {
                 } else {
                     handleDestroyView();
                     sentFileToServer();
-                    graphFragment.chronometer.stop();
+                    if (graphFragment != null){
+                        graphFragment.chronometer.stop();
+                    }
                 }
             }
         });
@@ -334,7 +336,9 @@ public class MeterFragment extends Fragment {
             settingsFragment.readPrefCal();
             soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
             soundMeter.thread.start();
-            graphFragment.startChronometer();
+            if (graphFragment != null){
+                graphFragment.startChronometer();
+            }
         }
     }
 }
