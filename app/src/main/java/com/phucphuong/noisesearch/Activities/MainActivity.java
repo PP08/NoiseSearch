@@ -28,10 +28,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ReplaceFont.replaceDefaultFont(this, "DEFAULT", "fonts/Roboto-Light.ttf");
-        ReplaceFont.replaceDefaultFont(this, "MONOSPACE", "fonts/Roboto-Light.ttf");
-        ReplaceFont.replaceDefaultFont(this, "SERIF", "fonts/Roboto-Light.ttf");
-        ReplaceFont.replaceDefaultFont(this, "SANS_SERIF", "fonts/Roboto-Light.ttf");
+        ReplaceFont.replaceDefaultFont(this, "DEFAULT", "fonts/Linotte_Regular.otf");
+        ReplaceFont.replaceDefaultFont(this, "MONOSPACE", "fonts/Linotte_Regular.otf");
+        ReplaceFont.replaceDefaultFont(this, "SERIF", "fonts/Linotte_Regular.otf");
+        ReplaceFont.replaceDefaultFont(this, "SANS_SERIF", "fonts/Linotte_Regular.otf");
 
         setContentView(R.layout.activity_main);
 
@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         }else {
             enableBtn();
         }
-
     }
 
 

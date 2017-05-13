@@ -38,7 +38,7 @@
             android:layout_marginBottom="32dp"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintVertical_bias="1.0"
-            android:src="@drawable/ic_clockface"/>
+            android:src="@drawable/ic_clockface_old"/>
 
         <ImageView
             android:id="@+id/clockwise"
