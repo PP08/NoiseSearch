@@ -49,8 +49,8 @@ public class AppInfo extends AppCompatActivity {
         layouts = new int[]{
                 R.layout.slide_noise_level_pref,
                 R.layout.slide_features_present,
-                R.layout.slide_about,
-                R.layout.welcome_slide4};
+                R.layout.slide_about_team,
+                R.layout.slide_app_about};
 
         // adding bottom dots
         addBottomDots(0);
