@@ -56,6 +56,9 @@ public class MeterFragment extends Fragment {
     Animation animation;
     ImageView clockwise;
 
+    //
+    private CheckGPSBeforeStart checkGPSBeforeStart;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -111,7 +114,7 @@ public class MeterFragment extends Fragment {
 //                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
 //                    soundMeter.thread.start();
 
-                    CheckGPSBeforeStart checkGPSBeforeStart = new CheckGPSBeforeStart(getView());
+                    checkGPSBeforeStart = new CheckGPSBeforeStart(getView());
                     checkGPSBeforeStart.execute();
 
                 } else {
@@ -125,6 +128,18 @@ public class MeterFragment extends Fragment {
         });
 
         return meterView;
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Log.e("hey", "im destroying");
+
+        if (checkGPSBeforeStart != null){
+            checkGPSBeforeStart.cancel(true);
+        }
     }
 
     private Handler handler = new Handler() {
