@@ -58,25 +58,24 @@
             app:layout_constraintVertical_bias="0.0"
             android:background="?attr/selectableItemBackground"
             android:textColor="@color/buttonTextColor"/>
-
-        <Button
-            android:id="@+id/btn_open"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginTop="0dp"
-            android:text="Open"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="w,3:1"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="@color/buttonTextColor"/>
+        <!--<Button-->
+            <!--android:id="@+id/btn_open"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_marginBottom="0dp"-->
+            <!--android:layout_marginLeft="0dp"-->
+            <!--android:layout_marginRight="0dp"-->
+            <!--android:layout_marginTop="0dp"-->
+            <!--android:text="Open"-->
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--app:layout_constraintDimensionRatio="w,3:1"-->
+            <!--app:layout_constraintHorizontal_bias="1.0"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:layout_constraintTop_toTopOf="parent"-->
+            <!--app:layout_constraintVertical_bias="0.0"-->
+            <!--android:background="?attr/selectableItemBackground"-->
+            <!--android:textColor="@color/buttonTextColor"/>-->
 
     </android.support.constraint.ConstraintLayout>
 

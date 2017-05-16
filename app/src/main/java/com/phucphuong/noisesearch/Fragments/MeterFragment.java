@@ -2,12 +2,16 @@ package com.phucphuong.noisesearch.Fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Telephony;
 import android.support.v4.app.Fragment;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +55,7 @@ public class MeterFragment extends Fragment {
     final ProgressDialog[] progressDialog = new ProgressDialog[1];
     boolean shouldContinue = true;
 
+    boolean isMeasuring = false;
 
     //
     Animation animation;
@@ -64,7 +69,7 @@ public class MeterFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         meterView = inflater.inflate(R.layout.fragment_meter, container, true);
-        ToggleButton btn_start_stop = (ToggleButton) meterView.findViewById(R.id.btn_start_stop);
+        final ToggleButton btn_start_stop = (ToggleButton) meterView.findViewById(R.id.btn_start_stop);
 
         btn_start_stop.setEnabled(false);
         btn_start_stop.setAlpha(0.8f);
@@ -113,11 +118,11 @@ public class MeterFragment extends Fragment {
 //                    settingsFragment.readPrefCal();
 //                    soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
 //                    soundMeter.thread.start();
-
                     checkGPSBeforeStart = new CheckGPSBeforeStart(getView());
                     checkGPSBeforeStart.execute();
 
                 } else {
+                    isMeasuring = false;
                     handleDestroyView();
                     sentFileToServer();
                     if (graphFragment != null){
@@ -126,6 +131,24 @@ public class MeterFragment extends Fragment {
                 }
             }
         });
+
+
+        TelephonyManager telephonyManager = (TelephonyManager)getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        PhoneStateListener phoneStateListener = new PhoneStateListener(){
+
+            @Override
+            public void onCallStateChanged(int state, String incomingNumber) {
+                super.onCallStateChanged(state, incomingNumber);
+
+                if(state==TelephonyManager.CALL_STATE_RINGING){
+                    if (isMeasuring){
+                        isMeasuring = false;
+                        btn_start_stop.setChecked(false);
+                    }
+                }
+            }
+        };
+        telephonyManager.listen(phoneStateListener,PhoneStateListener.LISTEN_CALL_STATE);
 
         return meterView;
     }
@@ -340,7 +363,6 @@ public class MeterFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-//            Log.e("thong bao", "xong roi ne");
 //            disable calibration button
             settingsFragment.setStateOfSettingsButtons(true);
 
@@ -354,6 +376,8 @@ public class MeterFragment extends Fragment {
             if (graphFragment != null){
                 graphFragment.startChronometer();
             }
+
+            isMeasuring = true;
         }
     }
 }

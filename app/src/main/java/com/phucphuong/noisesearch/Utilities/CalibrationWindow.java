@@ -1,5 +1,8 @@
 package com.phucphuong.noisesearch.Utilities;
 
+import android.annotation.TargetApi;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -7,6 +10,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import com.phucphuong.noisesearch.R;
 
 /**
@@ -25,30 +29,33 @@ public class CalibrationWindow {
     public boolean speedMode;
     AsyncTaskCalibration asyncTaskCalibration;
 
-    public CalibrationWindow(View view, float calibrationValue, boolean speedMode){
+    public CalibrationWindow(View view, float calibrationValue, boolean speedMode) {
 
         this.view = view;
         this.calibrationValue = calibrationValue;
         this.speedMode = speedMode;
     }
 
-    public void getViewElements(){
+    public void getViewElements() {
 
-        tv_spl = (TextView)view.findViewById(R.id.tv_spl);
+        tv_spl = (TextView) view.findViewById(R.id.tv_spl);
         tv_spl.setText("...dB");
 
-        btn_minus = (ImageButton)view.findViewById(R.id.btn_decrease);
-        btn_plus = (ImageButton)view.findViewById(R.id.btn_increase);
+        btn_minus = (ImageButton) view.findViewById(R.id.btn_decrease);
+        btn_plus = (ImageButton) view.findViewById(R.id.btn_increase);
 
-        sw_fastMode = (SwitchCompat)view.findViewById(R.id.sw_fastMode);
+        sw_fastMode = (SwitchCompat) view.findViewById(R.id.sw_fastMode);
 
         asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue, speedMode);
-        asyncTaskCalibration.execute();
+
+        asyncTaskCalibration.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+//        asyncTaskCalibration.execute();
 
         btn_minus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                asyncTaskCalibration.calibrationValue --;
+                asyncTaskCalibration.calibrationValue--;
 
             }
         });
@@ -56,11 +63,11 @@ public class CalibrationWindow {
         btn_plus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                asyncTaskCalibration.calibrationValue ++;
+                asyncTaskCalibration.calibrationValue++;
             }
         });
 
-        if (speedMode){
+        if (speedMode) {
             sw_fastMode.setChecked(true);
         }
 
@@ -73,11 +80,9 @@ public class CalibrationWindow {
             }
         });
 
-        sw_fastMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        sw_fastMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isTouched) {
                     isTouched = false;
                     if (isChecked) {
@@ -85,27 +90,33 @@ public class CalibrationWindow {
                         asyncTaskCalibration.cancel(true);
                         speedMode = true;
                         asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue, speedMode);
-                        asyncTaskCalibration.execute();
-                    }
-                    else {
+//                        asyncTaskCalibration.execute();
+                        asyncTaskCalibration.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    } else {
 
                         terminateThread();
                         asyncTaskCalibration.cancel(true);
                         speedMode = false;
                         asyncTaskCalibration = new AsyncTaskCalibration(tv_spl, calibrationValue, speedMode);
-                        asyncTaskCalibration.execute();
+//                        asyncTaskCalibration.execute();
+                        asyncTaskCalibration.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
                 }
             }
         });
     }
 
-    public void terminateThread(){
+    public void terminateThread() {
         calibrationValue = asyncTaskCalibration.calibrationValue;
         speedMode = asyncTaskCalibration.speedMode;
         asyncTaskCalibration.isRunning = false;
-        asyncTaskCalibration.thread.interrupt();
-        if (asyncTaskCalibration.recordInstance != null){
+        if (asyncTaskCalibration.thread != null){
+            if (asyncTaskCalibration.thread.isAlive()){
+                asyncTaskCalibration.thread.interrupt();
+            }
+        }
+
+        if (asyncTaskCalibration.recordInstance != null) {
             asyncTaskCalibration.recordInstance.release();
         }
     }

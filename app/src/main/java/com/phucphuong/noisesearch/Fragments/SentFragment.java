@@ -3,6 +3,8 @@ package com.phucphuong.noisesearch.Fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -53,7 +55,7 @@ public class SentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sent, container, false);
 
         listView = (ListView)view.findViewById(R.id.listView);
-        btn_openFile = (Button)view.findViewById(R.id.btn_open);
+//        btn_openFile = (Button)view.findViewById(R.id.btn_open);
         btn_deleteFile = (Button)view.findViewById(R.id.btn_delete);
 
 
@@ -61,21 +63,24 @@ public class SentFragment extends Fragment {
         fileManagerHelper = new FileManagerHelper(directory, view);
         fileManagerHelper.refreshFileList();
 
-        btn_openFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
-
-                for (int i = 0; i < listView.getCount(); i++){
-                    if (sparseBooleanArray.get(i)){
-
-                    }
-                }
-
-                fileManagerHelper.refreshFileList();
-            }
-        });
+//        btn_openFile.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
+//
+//                for (int i = 0; i < listView.getCount(); i++){
+//                    if (sparseBooleanArray.get(i)){
+//                        source = getContext().getFilesDir().toString() + "/Sent Files/" + listView.getItemAtPosition(i).toString();
+//                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(source));
+//                        intent.setDataAndType(Uri.parse(source), "application/pdf");
+//                        getContext().startActivity(intent);
+//                    }
+//                }
+//
+//                fileManagerHelper.refreshFileList();
+//            }
+//        });
 
         btn_deleteFile.setOnClickListener(new View.OnClickListener() {
             @Override

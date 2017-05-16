@@ -44,7 +44,7 @@ public class FileManagerHelper {
         this.view = view;
         this.btn_deleteFile = (Button) view.findViewById(R.id.btn_delete);
         this.btn_send = (Button) view.findViewById(R.id.btn_send);
-        this.btn_openFile = (Button)view.findViewById(R.id.btn_open);
+//        this.btn_openFile = (Button)view.findViewById(R.id.btn_open);
     }
 
     public File[] getFiles(String DirectoryPath) {
