@@ -6,7 +6,6 @@ import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Process;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import java.util.Arrays;
@@ -15,21 +14,21 @@ import java.util.Arrays;
  * Created by phucphuong on 3/21/17.
  */
 
-public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
+public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
 
     AudioRecord recordInstance;
-    int sampleRateInHz;
+    private int sampleRateInHz;
     private static int ENCODING;
     private static int CHANNEL;
     private int BUFFSIZE;
     boolean isRunning, speedMode;
     Thread thread;
-    double splValue = 0.0;
+    private double splValue = 0.0;
     float calibrationValue;
 
-    TextView textView;
+    private TextView textView;
 
-    public AsyncTaskCalibration(TextView tv, float calibrationValue, boolean speedMode){
+    public AsyncTaskCalibration(TextView tv, float calibrationValue, boolean speedMode) {
         this.textView = tv;
         this.calibrationValue = calibrationValue;
         this.speedMode = speedMode;
@@ -41,13 +40,13 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
         sampleRateInHz = 44100;
         ENCODING = AudioFormat.ENCODING_PCM_16BIT;
         CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-        if (speedMode){
+        if (speedMode) {
             BUFFSIZE = sampleRateInHz * 2;
-        }else {
+        } else {
             BUFFSIZE = sampleRateInHz * 4;
         }
         isRunning = true;
-        if (recordInstance != null){
+        if (recordInstance != null) {
             recordInstance.release();
         }
 
@@ -73,7 +72,7 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
         super.onPostExecute(aVoid);
     }
 
-    public class MyRunable implements Runnable{
+    public class MyRunable implements Runnable {
 
         @Override
         public void run() {
@@ -84,17 +83,17 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
                 Log.e("State", Integer.toString(recordInstance.getState()));
                 recordInstance.startRecording();
                 short[] temBuffer = new short[BUFFSIZE];
-                while (isRunning){
+                while (isRunning) {
                     Log.e("test", "test");
                     splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
-                    splValue += (double)calibrationValue;
+                    splValue += (double) calibrationValue;
                     publishProgress(splValue);
                 }
-                if (recordInstance.getState() == 1){
+                if (recordInstance.getState() == 1) {
                     try {
                         recordInstance.stop();
                         recordInstance.release();
-                    }catch (Exception ignored){
+                    } catch (Exception ignored) {
 
                     }
                 }
@@ -105,7 +104,7 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
         }
     }
 
-    private double measureDecibel(short[] temBuffer, int BUFFSIZE, AudioRecord recordInstance){
+    private double measureDecibel(short[] temBuffer, int BUFFSIZE, AudioRecord recordInstance) {
 
         double rsmValue = 0;
         double spl;
@@ -115,8 +114,8 @@ public class AsyncTaskCalibration extends AsyncTask <Double, Double, Void> {
             rsmValue += temBuffer[i] * temBuffer[i];
         }
         rsmValue = Math.sqrt(rsmValue);
-        spl = 10 * Math.log10(rsmValue/BUFFSIZE) + 94;
+        spl = 10 * Math.log10(rsmValue / BUFFSIZE) + 94;
         spl = Math.round(spl);
-        return  spl;
+        return spl;
     }
 }
