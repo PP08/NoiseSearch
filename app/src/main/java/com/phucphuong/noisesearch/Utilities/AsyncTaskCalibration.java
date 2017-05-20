@@ -64,7 +64,7 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
     protected void onProgressUpdate(Double... values) {
         super.onProgressUpdate(values);
         textView.setText(Double.toString(splValue));
-//        TODO: calirate the value
+//        TODO: calibrate the value
     }
 
     @Override
@@ -82,10 +82,10 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
                         CHANNEL, ENCODING, BUFFSIZE);
                 Log.e("State", Integer.toString(recordInstance.getState()));
                 recordInstance.startRecording();
-                short[] temBuffer = new short[BUFFSIZE];
+                short[] audioBuffer = new short[BUFFSIZE / 2];
                 while (isRunning) {
                     Log.e("test", "test");
-                    splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
+                    splValue = measureDecibel(audioBuffer, audioBuffer.length, recordInstance);
                     splValue += (double) calibrationValue;
                     publishProgress(splValue);
                 }
@@ -104,17 +104,17 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
         }
     }
 
-    private double measureDecibel(short[] temBuffer, int BUFFSIZE, AudioRecord recordInstance) {
+    private double measureDecibel(short[] audioBuffer, int audioBufferSize, AudioRecord recordInstance) {
 
         double rsmValue = 0;
         double spl;
-        Arrays.fill(temBuffer, (short) 0);
-        recordInstance.read(temBuffer, 0, BUFFSIZE);
-        for (int i = 0; i < BUFFSIZE; i++) {
-            rsmValue += temBuffer[i] * temBuffer[i];
+//        Arrays.fill(audioBuffer, (short) 0);
+        recordInstance.read(audioBuffer, 0, audioBufferSize);
+        for (int i = 0; i < audioBufferSize; i++) {
+            rsmValue += audioBuffer[i] * audioBuffer[i];
         }
         rsmValue = Math.sqrt(rsmValue);
-        spl = 10 * Math.log10(rsmValue / BUFFSIZE) + 94;
+        spl = 10 * Math.log10(rsmValue / audioBufferSize) + 94;
         spl = Math.round(spl);
         return spl;
     }

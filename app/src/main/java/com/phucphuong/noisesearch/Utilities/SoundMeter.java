@@ -119,11 +119,11 @@ public class SoundMeter {
                 Log.e("State", Integer.toString(recordInstance.getState()));
                 recordInstance.startRecording();
 
-                short[] temBuffer = new short[BUFFSIZE];
+                short[] audioBuffer = new short[BUFFSIZE / 2];
 
                 while (isRunning) {
                     long startTime = System.currentTimeMillis();
-                    splValue = measureDecibel(temBuffer, BUFFSIZE, recordInstance);
+                    splValue = measureDecibel(audioBuffer, audioBuffer.length, recordInstance);
                     long endTime = System.currentTimeMillis();
                     getTimestamp(startTime, endTime);
                     //get the location
@@ -156,21 +156,21 @@ public class SoundMeter {
         handler.sendMessage(data);
     }
 
-    private double measureDecibel(short[] temBuffer, int BUFFSIZE, AudioRecord recordInstance){
+    private double measureDecibel(short[] audioBuffer, int audioBufferSize, AudioRecord recordInstance){
 
         double rsmValue = 0;
         double spl;
 
-        Arrays.fill(temBuffer, (short) 0);
+//        Arrays.fill(audioBuffer, (short) 0);
 
-        recordInstance.read(temBuffer, 0, BUFFSIZE);
+        recordInstance.read(audioBuffer, 0, audioBufferSize);
 
-        for (int i = 0; i < BUFFSIZE; i++) {
-            rsmValue += temBuffer[i] * temBuffer[i];
+        for (int i = 0; i < audioBufferSize; i++) {
+            rsmValue += audioBuffer[i] * audioBuffer[i];
         }
 
         rsmValue = Math.sqrt(rsmValue);
-        spl = 10 * Math.log10(rsmValue/BUFFSIZE) + 94;
+        spl = 10 * Math.log10(rsmValue/audioBufferSize) + 94;
 
         spl += (double)calibrationValue;
         spl = Math.round(spl * 100.0) / 100.0;
