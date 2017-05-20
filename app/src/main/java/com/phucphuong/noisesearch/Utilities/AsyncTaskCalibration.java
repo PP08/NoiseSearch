@@ -109,25 +109,7 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
 
     private double measureDecibel(short[] audioBuffer, int audioBufferSize, AudioRecord recordInstance) {
 
-        double rsmValue = 0;
-        double spl;
-//        Arrays.fill(audioBuffer, (short) 0);
         recordInstance.read(audioBuffer, 0, audioBufferSize);
-        //recordInstance.read(audioBuffer, 0, audioBufferSize, AudioRecord.READ_BLOCKING);
-//        for (int i = 0; i < audioBufferSize; i++) {
-//            rsmValue += audioBuffer[i] * audioBuffer[i];
-//        }
-//        rsmValue = Math.sqrt(rsmValue);
-//        spl = 10 * Math.log10(rsmValue / audioBufferSize) + 94;
-//        spl = Math.round(spl);
-//        return spl;
-
-        //FloatFFT_1D fft = new FloatFFT_1D(audioBufferSize);
-
-        //fft.realForward(audioBuffer);
-
-//        Log.e("fft", fft.toString());
-        //convert short[] to double[]
 
         double[] audioBufferInDouble = new double[audioBufferSize];
 
@@ -139,70 +121,47 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
         DoubleFFT_1D fft = new DoubleFFT_1D(audioBufferSize);
 
         fft.realForward(audioBufferInDouble);
-        double[] f = new double[audioBufferSize];
+
 
         ArrayList<Integer> indices = new ArrayList<>();
 
         for (int i = 0; i < audioBufferSize; i++) {
             audioBufferInDouble[i] = Math.abs(audioBufferInDouble[i]);
-            f[i] = (sampleRateInHz / audioBufferSize) * audioBufferInDouble[i];
-            if (f[i] < sampleRateInHz / 2) {
+            if (audioBufferInDouble[i] == 0){
+                audioBufferInDouble[i] = 1e-17;
+            }
+
+            if (audioBufferInDouble[i] < sampleRateInHz / 2) {
                 indices.add(i);
             }
         }
 
-//        double[] arraylistF = new double[indices.size()];
-//        double[] X = new double[indices.size()];
-
-        double[] nf = new double[indices.size()];
-        double[] X = new double[indices.size()];
+        double[] f = new double[indices.size()];
 
         for (int i = 0; i < indices.size(); i++) {
-            nf[i] = f[indices.get(i)];
-            X[i] = audioBufferInDouble[indices.get(i)];
+            f[i] = audioBufferInDouble[indices.get(i)];
+//            X[i] = audioBufferInDouble[indices.get(i)];
         }
 
         double[] A;
 
-//        //apply A-weighting filter
-//        A = filterA(nf);
-//
-        double result = 0;
-        double totalEnergy;
-        double meanEnergy;
-//
-//        //estimate dBA value using Parseval's relation
-//
-//        for (double a: A){
-//            result += a * a;
-//        }
-//
-//        Log.e("result ", Double.toString(result));
-//        totalEnergy = result / A.length;
-//
-//        meanEnergy = totalEnergy / ((audioBufferSize / sampleRateInHz));
-//
-//
-//
-//        Log.e("mean energy ", Double.toString((audioBufferSize / sampleRateInHz)));
-//
-//        double dBA = 10 * Math.log10(totalEnergy) + 94;
-//
-//
-//        dBA = Math.round(dBA * 100.0) / 100.0;
+        //filter A-weight
 
-        A = filterA(audioBufferInDouble);
+        A = filterA(f);
 
-        for (double a : A) {
-            result += a * a;
+        double sumSquare = 0;
+
+        for (int i = 0; i < A.length/2 + 1; i++){
+            sumSquare += A[i] * A[i];
         }
 
-//        for (int i = 0; i < A.length; i++) {
-//
-//
-//        }
+        sumSquare = 2 * sumSquare / A.length;
 
-        double dBA = 10 * Math.log10(result / audioBufferSize) + 72;
+        double dBA = 10 * Math.log10(sumSquare) + (double) 94;
+
+        dBA += (double) calibrationValue;
+
+        dBA = Math.round(dBA * 100.0) / 100.0;
 
         return dBA;
     }
