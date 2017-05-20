@@ -8,6 +8,9 @@ import android.os.Process;
 import android.util.Log;
 import android.widget.TextView;
 
+import org.jtransforms.fft.DoubleFFT_1D;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -110,12 +113,126 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
         double spl;
 //        Arrays.fill(audioBuffer, (short) 0);
         recordInstance.read(audioBuffer, 0, audioBufferSize);
+        //recordInstance.read(audioBuffer, 0, audioBufferSize, AudioRecord.READ_BLOCKING);
+//        for (int i = 0; i < audioBufferSize; i++) {
+//            rsmValue += audioBuffer[i] * audioBuffer[i];
+//        }
+//        rsmValue = Math.sqrt(rsmValue);
+//        spl = 10 * Math.log10(rsmValue / audioBufferSize) + 94;
+//        spl = Math.round(spl);
+//        return spl;
+
+        //FloatFFT_1D fft = new FloatFFT_1D(audioBufferSize);
+
+        //fft.realForward(audioBuffer);
+
+//        Log.e("fft", fft.toString());
+        //convert short[] to double[]
+
+        double[] audioBufferInDouble = new double[audioBufferSize];
+
+
         for (int i = 0; i < audioBufferSize; i++) {
-            rsmValue += audioBuffer[i] * audioBuffer[i];
+            audioBufferInDouble[i] = audioBuffer[i];
         }
-        rsmValue = Math.sqrt(rsmValue);
-        spl = 10 * Math.log10(rsmValue / audioBufferSize) + 94;
-        spl = Math.round(spl);
-        return spl;
+
+        DoubleFFT_1D fft = new DoubleFFT_1D(audioBufferSize);
+
+        fft.realForward(audioBufferInDouble);
+        double[] f = new double[audioBufferSize];
+
+        ArrayList<Integer> indices = new ArrayList<>();
+
+        for (int i = 0; i < audioBufferSize; i++) {
+            audioBufferInDouble[i] = Math.abs(audioBufferInDouble[i]);
+            f[i] = (sampleRateInHz / audioBufferSize) * audioBufferInDouble[i];
+            if (f[i] < sampleRateInHz / 2) {
+                indices.add(i);
+            }
+        }
+
+//        double[] arraylistF = new double[indices.size()];
+//        double[] X = new double[indices.size()];
+
+        double[] nf = new double[indices.size()];
+        double[] X = new double[indices.size()];
+
+        for (int i = 0; i < indices.size(); i++) {
+            nf[i] = f[indices.get(i)];
+            X[i] = audioBufferInDouble[indices.get(i)];
+        }
+
+        double[] A;
+
+//        //apply A-weighting filter
+//        A = filterA(nf);
+//
+        double result = 0;
+        double totalEnergy;
+        double meanEnergy;
+//
+//        //estimate dBA value using Parseval's relation
+//
+//        for (double a: A){
+//            result += a * a;
+//        }
+//
+//        Log.e("result ", Double.toString(result));
+//        totalEnergy = result / A.length;
+//
+//        meanEnergy = totalEnergy / ((audioBufferSize / sampleRateInHz));
+//
+//
+//
+//        Log.e("mean energy ", Double.toString((audioBufferSize / sampleRateInHz)));
+//
+//        double dBA = 10 * Math.log10(totalEnergy) + 94;
+//
+//
+//        dBA = Math.round(dBA * 100.0) / 100.0;
+
+        A = filterA(audioBufferInDouble);
+
+        for (double a : A) {
+            result += a * a;
+        }
+
+//        for (int i = 0; i < A.length; i++) {
+//
+//
+//        }
+
+        double dBA = 10 * Math.log10(result / audioBufferSize) + 72;
+
+        return dBA;
+    }
+
+
+    private double[] filterA(double[] f) {
+
+        double c1 = 3.5041384e16;
+        double c2 = Math.pow(20.598997, 2);
+        double c3 = Math.pow(107.65265, 2);
+        double c4 = Math.pow(737.86223, 2);
+        double c5 = Math.pow(12194.217, 2);
+
+        double[] num = new double[f.length];
+        double[] den = new double[f.length];
+        double[] A = new double[f.length];
+
+        for (int i = 0; i < f.length; i++) {
+
+            f[i] = Math.pow(f[i], 2);
+
+            num[i] = c1 * Math.pow(f[i], 4);
+
+            den[i] = Math.pow(c2 + f[i], 2) * (c3 + f[i]) * (c4 + f[i]) * Math.pow(c5 + f[i], 2);
+
+            A[i] = num[i] / den[i];
+
+        }
+
+        return A;
+
     }
 }
