@@ -147,17 +147,17 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
 
         //filter A-weight
 
-        A = filterA(f);
+//        A = filterA(f);
 
         double sumSquare = 0;
 
-        for (int i = 0; i < A.length/2 + 1; i++){
-            sumSquare += A[i] * A[i];
+        for (int i = 0; i < f.length/2 + 1; i++){
+            sumSquare += f[i] * f[i];
         }
 
-        sumSquare = 2 * sumSquare / A.length;
+        sumSquare = 2 * sumSquare / f.length;
 
-        double dBA = 10 * Math.log10(sumSquare) + (double) 94;
+        double dBA = 10 * Math.log10(sumSquare) + (double) 50;
 
         dBA += (double) calibrationValue;
 

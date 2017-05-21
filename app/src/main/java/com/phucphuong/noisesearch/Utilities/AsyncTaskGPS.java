@@ -69,7 +69,7 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
 
                 shouldContinue = false;
             }else {
-                gpsTracker.lastLocation = gpsTracker.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                gpsTracker.lastLocation = gpsTracker.locationManager.getLastKnownLocation(gpsTracker.nameOfGPSProvider);
             }
         }
         gpsTracker.stopUsingGPS();

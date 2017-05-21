@@ -14,6 +14,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 /**
  * Created by phucphuong on 3/17/17.
  */
@@ -46,6 +48,7 @@ public class GPSTracker extends Service implements LocationListener {
     private Context context;
     boolean checkGPS = false;
     boolean canGetLocation = false;
+    public String nameOfGPSProvider = "";
 
     Location lastLocation;
     double latitude, longitude;
@@ -64,10 +67,20 @@ public class GPSTracker extends Service implements LocationListener {
             locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
 
             //getting GPS status
-            checkGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//            checkGPS = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            checkGPS = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-            if (!checkGPS){
+            Log.e("network", Boolean.toString(checkGPS));
+
+            if (checkGPS){
+                nameOfGPSProvider = LocationManager.NETWORK_PROVIDER;
+            }else {
+                checkGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                if (checkGPS){
+                    nameOfGPSProvider = LocationManager.GPS_PROVIDER;
+                }
+            }
+
+            if (nameOfGPSProvider.equals("")){
                 Toast.makeText(context, "No Service Provider Available", Toast.LENGTH_LONG).show();
                 showSettingsAlert();
             }else {
@@ -75,11 +88,11 @@ public class GPSTracker extends Service implements LocationListener {
 //                Toast.makeText(context, "GPS", Toast.LENGTH_SHORT).show();
 
                 try {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                    locationManager.requestLocationUpdates(nameOfGPSProvider, 0, 0, this);
 //                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
                     Log.e("GPS Enabled", "GPS Enabled");
                     if (locationManager != null) {
-                        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        lastLocation = locationManager.getLastKnownLocation(nameOfGPSProvider);
 //                        lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (lastLocation != null) {
                             latitude = lastLocation.getLatitude();
