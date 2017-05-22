@@ -160,6 +160,7 @@ public class MeterFragment extends Fragment {
         Log.e("hey", "im destroying");
 
         if (checkGPSBeforeStart != null){
+            checkGPSBeforeStart.gpsTracker.stopUsingGPS();
             checkGPSBeforeStart.cancel(true);
         }
     }

@@ -23,7 +23,7 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
 
     private ProgressDialog progressDialog;
     private View view;
-    private GPSTracker gpsTracker;
+    public GPSTracker gpsTracker;
     private boolean shouldContinue = true;
 
 
