@@ -126,7 +126,7 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
         ArrayList<Integer> indices = new ArrayList<>();
 
         for (int i = 0; i < audioBufferSize; i++) {
-            audioBufferInDouble[i] = Math.abs(audioBufferInDouble[i]);
+//            audioBufferInDouble[i] = Math.abs(audioBufferInDouble[i]);
             if (audioBufferInDouble[i] == 0){
                 audioBufferInDouble[i] = 1e-17;
             }
@@ -147,17 +147,21 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
 
         //filter A-weight
 
-//        A = filterA(f);
+        A = filterA(f);
+
+        DoubleFFT_1D fft_inverse = new DoubleFFT_1D(A.length);
+
+        fft_inverse.realInverse(A, false);
 
         double sumSquare = 0;
 
-        for (int i = 0; i < f.length/2 + 1; i++){
-            sumSquare += f[i] * f[i];
+        for (int i = 0; i < A.length; i++){
+            sumSquare += A[i] * A[i];
         }
 
-        sumSquare = 2 * sumSquare / f.length;
+        sumSquare = sumSquare / A.length;
 
-        double dBA = 10 * Math.log10(sumSquare) + (double) 50;
+        double dBA = 10 * Math.log10(sumSquare / (audioBufferSize/ sampleRateInHz)) + (double) 94;
 
         dBA += (double) calibrationValue;
 
