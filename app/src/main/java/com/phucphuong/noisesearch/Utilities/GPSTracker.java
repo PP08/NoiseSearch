@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -69,9 +71,17 @@ public class GPSTracker extends Service implements LocationListener {
             //getting GPS status
             checkGPS = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
+            ConnectivityManager cm =
+                    (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+
+
             Log.e("network", Boolean.toString(checkGPS));
 
-            if (checkGPS){
+            if (checkGPS && isConnected){
                 nameOfGPSProvider = LocationManager.NETWORK_PROVIDER;
             }else {
                 checkGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
