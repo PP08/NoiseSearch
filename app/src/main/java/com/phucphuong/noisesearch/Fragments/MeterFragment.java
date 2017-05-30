@@ -198,7 +198,7 @@ public class MeterFragment extends Fragment {
                 if (mapFragment != null) {
                     mapFragment.setEndMarker();
                 }
-//                TODO: raise the notification here. User has left his place
+//                TODO: raise the notification here. User has left his place (done)
 
 //                isMeasuring = false;
 //                handleDestroyView();
