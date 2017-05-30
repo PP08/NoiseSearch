@@ -12,6 +12,7 @@ import android.os.Message;
 import android.os.Process;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.phucphuong.noisesearch.Fragments.MapFragment;
 
@@ -63,6 +64,12 @@ public class SoundMeter {
     Location location;
     double latitude, longitude;
 
+
+    //restrict the radius for single point
+    double init_latitude, init_longitude;
+    int mode;
+    boolean out_the_circle = false;
+
     //for log
     public String FILENAME = "";
     private String device_id = "";
@@ -73,12 +80,15 @@ public class SoundMeter {
     //for testing
     String errorTag = "has an error: ";
 
-    public SoundMeter(Handler h, Context context, float calValue, boolean speedMode, String prefix) {
+    public SoundMeter(Handler h, Context context, float calValue, boolean speedMode, String prefix, double init_latitude, double init_longitude, int mode) {
         this.handler = h;
         this.context = context;
         this.calibrationValue = calValue;
         this.speedMode = speedMode;
         this.prefix = prefix;
+        this.init_latitude = init_latitude;
+        this.init_longitude = init_longitude;
+        this.mode = mode;
         gpsTracker = new GPSTracker(context);
         logThread.start();
     }
@@ -125,11 +135,29 @@ public class SoundMeter {
                     long startTime = System.currentTimeMillis();
                     splValue = measureDecibel(audioBuffer, audioBuffer.length, recordInstance);
                     long endTime = System.currentTimeMillis();
-                    getTimestamp(startTime, endTime);
+
                     //get the location
                     location = gpsTracker.lastLocation;
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
+
+                    if (mode == 1){
+                        double distance = getTheDistance(init_latitude, init_longitude, latitude, longitude);
+                        if (distance > 10){
+                            terminate();
+                            out_the_circle = true;
+                        }else {
+                            getTimestamp(startTime, endTime);
+                        }
+                    }else {
+                        getTimestamp(startTime, endTime);
+                    }
+
+
+//                    //get the location
+//                    location = gpsTracker.lastLocation;
+//                    latitude = location.getLatitude();
+//                    longitude = location.getLongitude();
                     sendMessage();
 
                 }
@@ -144,6 +172,24 @@ public class SoundMeter {
         }
     }
 
+    private double getTheDistance(double init_latitude, double init_longitude, double latitude, double longitude) {
+        double R = 6372.8;
+        double delta_latitude = Math.toRadians(latitude - init_latitude);
+        double delta_longitude = Math.toRadians(longitude - init_longitude);
+
+        double rad_latitude1 = Math.toRadians(init_latitude);
+        double rad_latitude2 = Math.toRadians(latitude);
+
+        double a = Math.pow(Math.sin(delta_latitude / 2), 2) + Math.cos(rad_latitude1) * Math.cos(rad_latitude2) *
+                Math.pow(Math.sin(delta_longitude / 2), 2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        return R * c * 1000;
+
+    }
+
+
     public Thread thread = new Thread(new MyRunable());
 
     private void sendMessage(){
@@ -151,6 +197,7 @@ public class SoundMeter {
         b = new Bundle();
         b.putDouble("spl", splValue);
         b.putBoolean("isRunning", isRunning);
+        b.putBoolean("outTheCircle", out_the_circle);
         b.putDoubleArray("location", new double[]{latitude, longitude});
         data.setData(b);
         handler.sendMessage(data);

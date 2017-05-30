@@ -52,7 +52,7 @@ public class GPSTracker extends Service implements LocationListener {
     boolean canGetLocation = false;
     public String nameOfGPSProvider = "";
 
-    Location lastLocation;
+    public Location lastLocation;
     double latitude, longitude;
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;

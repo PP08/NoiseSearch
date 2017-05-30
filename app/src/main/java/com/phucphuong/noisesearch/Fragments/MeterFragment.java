@@ -47,6 +47,7 @@ public class MeterFragment extends Fragment {
     public SettingsFragment settingsFragment;
     public GraphFragment graphFragment;
     public MapFragment mapFragment;
+    private ToggleButton btn_start_stop;
 
     private String prefix;
     View meterView;
@@ -68,7 +69,7 @@ public class MeterFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         meterView = inflater.inflate(R.layout.fragment_meter, container, true);
-        final ToggleButton btn_start_stop = (ToggleButton) meterView.findViewById(R.id.btn_start_stop);
+        btn_start_stop = (ToggleButton) meterView.findViewById(R.id.btn_start_stop);
 
         btn_start_stop.setEnabled(false);
         btn_start_stop.setAlpha(0.8f);
@@ -171,6 +172,7 @@ public class MeterFragment extends Fragment {
             super.handleMessage(msg);
             handler.obtainMessage();
             boolean isRunning = msg.getData().getBoolean("isRunning");
+            boolean outTheCircle = msg.getData().getBoolean("outTheCircle");
             double[] location = msg.getData().getDoubleArray("location");
 
             if (isRunning) {
@@ -195,6 +197,22 @@ public class MeterFragment extends Fragment {
             } else {
                 if (mapFragment != null) {
                     mapFragment.setEndMarker();
+                }
+//                TODO: raise the notification here. User has left his place
+
+//                isMeasuring = false;
+//                handleDestroyView();
+//                sentFileToServer();
+//                if (graphFragment != null){
+//                    graphFragment.chronometer.stop();
+//                }
+                if (outTheCircle){
+                    handleDestroyView();
+                    graphFragment.chronometer.stop();
+                    btn_start_stop.setChecked(false);
+
+//                    sentFileToServer();
+                    Toast.makeText(getContext(), "You've left your start place!", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -366,12 +384,18 @@ public class MeterFragment extends Fragment {
 //            disable calibration button
             settingsFragment.setStateOfSettingsButtons(true);
 
+            int mode;
+
             if (mapFragment != null) {
                 //start asyncTask here
                 mapFragment.startGPSTracker();
+                mode = 2;
+            }else{
+                mode = 1;
             }
             settingsFragment.readPrefCal();
-            soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix);
+            soundMeter = new SoundMeter(handler, getActivity(), settingsFragment.calirationValue, settingsFragment.speedMode, prefix,
+                    gpsTracker.lastLocation.getLatitude(), gpsTracker.lastLocation.getLongitude(), mode);
             soundMeter.thread.start();
             if (graphFragment != null){
                 graphFragment.startChronometer();
