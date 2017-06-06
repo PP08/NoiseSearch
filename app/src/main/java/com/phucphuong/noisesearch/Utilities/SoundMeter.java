@@ -143,7 +143,7 @@ public class SoundMeter {
 
                     if (mode == 1){
                         double distance = getTheDistance(init_latitude, init_longitude, latitude, longitude);
-                        if (distance > 10){
+                        if (distance > 50){
                             terminate();
                             out_the_circle = true;
                         }else {
@@ -217,7 +217,7 @@ public class SoundMeter {
         }
 
         rsmValue = Math.sqrt(rsmValue);
-        spl = 10 * Math.log10(rsmValue/audioBufferSize) + 94;
+        spl = 20 * Math.log10(rsmValue/audioBufferSize) + 50;
 
         spl += (double)calibrationValue;
         spl = Math.round(spl * 100.0) / 100.0;

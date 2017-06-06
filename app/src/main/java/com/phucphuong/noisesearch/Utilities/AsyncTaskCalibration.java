@@ -114,7 +114,7 @@ public class AsyncTaskCalibration extends AsyncTask<Double, Double, Void> {
             rsmValue += audioBuffer[i] * audioBuffer[i];
         }
         rsmValue = Math.sqrt(rsmValue);
-        spl = 10 * Math.log10(rsmValue / audioBufferSize) + 94;
+        spl = 20 * Math.log10(rsmValue / audioBufferSize) + 50;
         spl = Math.round(spl);
         return spl;
     }

@@ -79,7 +79,8 @@ public class GPSTracker extends Service implements LocationListener {
                     activeNetwork.isConnectedOrConnecting();
 
 
-            Log.e("network", Boolean.toString(checkGPS));
+            Log.e("network", Boolean.toString(isConnected));
+
 
             if (checkGPS && isConnected){
                 nameOfGPSProvider = LocationManager.NETWORK_PROVIDER;
@@ -89,6 +90,10 @@ public class GPSTracker extends Service implements LocationListener {
                     nameOfGPSProvider = LocationManager.GPS_PROVIDER;
                 }
             }
+
+
+            Log.e("name of gps provider", nameOfGPSProvider);
+
 
             if (nameOfGPSProvider.equals("")){
                 Toast.makeText(context, "No Service Provider Available", Toast.LENGTH_LONG).show();
@@ -100,7 +105,7 @@ public class GPSTracker extends Service implements LocationListener {
                 try {
                     locationManager.requestLocationUpdates(nameOfGPSProvider, 0, 0, this);
 //                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-                    Log.e("GPS Enabled", "GPS Enabled");
+                    //Log.e("GPS Enabled", "GPS Enabled");
                     if (locationManager != null) {
                         lastLocation = locationManager.getLastKnownLocation(nameOfGPSProvider);
 //                        lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);

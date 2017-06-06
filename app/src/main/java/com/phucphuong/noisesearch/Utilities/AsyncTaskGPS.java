@@ -25,6 +25,7 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
     private View view;
     public GPSTracker gpsTracker;
     private boolean shouldContinue = true;
+    private boolean success = false;
 
 
     public AsyncTaskGPS(View view){
@@ -50,7 +51,10 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
                     toggleButton.setAlpha(0.5f);
                     progressDialog.dismiss();
 //                    progressDialog.dismiss();
-                    Toast.makeText(view.getContext(), "You can start measure after your location has created", Toast.LENGTH_LONG).show();
+                    Toast.makeText(view.getContext(), "You can start measuring after your location has created", Toast.LENGTH_LONG).show();
+                    shouldContinue = false;
+                    success = false;
+
                 }
                 return true;
             }
@@ -68,6 +72,7 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
 //                Log.e("system time", Long.toString(System.currentTimeMillis()));
 
                 shouldContinue = false;
+                success = true;
             }else {
                 gpsTracker.lastLocation = gpsTracker.locationManager.getLastKnownLocation(gpsTracker.nameOfGPSProvider);
             }
@@ -81,8 +86,11 @@ public class AsyncTaskGPS extends AsyncTask<Void, Void, Void> {
         if (progressDialog.isShowing()){
             progressDialog.dismiss();
         }
-        ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
-        toggleButton.setEnabled(true);
-        toggleButton.setAlpha(1f);
+        if (success){
+            ToggleButton toggleButton = (ToggleButton)view.findViewById(R.id.btn_start_stop);
+            toggleButton.setEnabled(true);
+            toggleButton.setAlpha(1f);
+        }
+
     }
 }

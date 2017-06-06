@@ -306,7 +306,7 @@ public class MeterFragment extends Fragment {
             } else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Files uploaded successful");
-                alert.setMessage("Your files have uploaded to our server. Thank you for your help!");
+                alert.setMessage("Your files have uploaded to our server. Thank you! we appreciate your support!");
                 alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -342,7 +342,7 @@ public class MeterFragment extends Fragment {
             if (soundMeter.thread.isAlive()) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Stop Measuring");
-                alert.setMessage("Do you want to stop the measuring?");
+                alert.setMessage("Do you want to stop measuring?");
                 alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -126,7 +126,9 @@ public class SettingsFragment extends Fragment {
             sign_up_tv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String url = "https://noisesearch.herokuapp.com/signup/";
+//                    String url = "https://noisesearch.herokuapp.com/signup/";
+//                    String url = "http://192.168.1.43/signup/";
+                    String url = "http://172.20.10.13/signup/";
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(url));
                     startActivity(i);

@@ -195,8 +195,8 @@ public class UnsentFragment extends Fragment {
             }else {
                 fileManagerHelper.refreshFileList();
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Files uploaded successful");
-                alert.setMessage("Your files have uploaded to our server. Thank you for your help!");
+                alert.setTitle("Files uploaded successfully");
+                alert.setMessage("Your files have uploaded to our server. Thank you! we appreciate your support!");
                 alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
